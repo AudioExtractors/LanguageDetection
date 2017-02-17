@@ -1,4 +1,6 @@
 import os
+
+import python_speech_features as psf
 from pydub import AudioSegment
 import scipy
 import numpy as np
@@ -6,7 +8,9 @@ from pydub.playback import play
 import scipy.io.wavfile as wavfile
 from pydub.playback import play
 from matplotlib.pyplot import plot,subplot,xlabel,ylabel,show,figure
+import matplotlib.pyplot as plt
 from scipy import fft,arange
+from python_speech_features import mfcc
 #TUTS
 #os.mkdir('')
 #os.mkdirs('')
@@ -88,9 +92,35 @@ def filter():
                 print mf,f
             else:
                 print f"""
+def MFCCExtract(file,num,color):
+    x=wavfile.read(file)
+    feat=psf.mfcc(x[1],x[0])
+    X=[]
+    for f in feat:
+        X.append(f[0])
+    Y=[]
+    for f in feat:
+        Y.append(f[1])
+    figure(num)
+    xlabel("MFCC Coeff 1")
+    ylabel("MFCC Coeff 2")
+    plot(X,Y,color)
+    plt.axis([0,50,-70,40])
+    plt.grid(True)
 
 if __name__ == "__main__":
     file="DNEW//0-99//eng_train7.wav"
-    read("DNEW//0-99//eng_train7.wav")
-    spectrum(file)
+    #read("DNEW//0-99//eng_train7.wav")
+    #spectrum(file)
     #filter()
+    MFCCExtract(file,1,'rd')
+    file2="dataset2//prac.wav"
+    #MFCCExtract(file2,1,'gd')
+
+    file3="dataset2//prac2.wav"
+    MFCCExtract(file3,1,'bd')
+
+
+    file4="DNEW//100-199//eng_train145.wav"
+    MFCCExtract(file4,1,'go')
+    show()
