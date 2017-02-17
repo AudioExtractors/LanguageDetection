@@ -1,5 +1,5 @@
 import os
-
+import tarfile
 import python_speech_features as psf
 from pydub import AudioSegment
 import scipy
@@ -109,11 +109,11 @@ def MFCCExtract(file,num,color):
     plt.grid(True)
 
 if __name__ == "__main__":
-    file="DNEW//0-99//eng_train7.wav"
+    file="DNEW3//0-99//dutch_train12.wav"
     #read("DNEW//0-99//eng_train7.wav")
-    #spectrum(file)
+    spectrum(file)
     #filter()
-    MFCCExtract(file,1,'rd')
+    """MFCCExtract(file,1,'rd')
     file2="dataset2//prac.wav"
     #MFCCExtract(file2,1,'gd')
 
@@ -122,5 +122,5 @@ if __name__ == "__main__":
 
 
     file4="DNEW//100-199//eng_train145.wav"
-    MFCCExtract(file4,1,'go')
+    MFCCExtract(file4,1,'go')"""
     show()
