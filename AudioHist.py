@@ -20,6 +20,7 @@ for i in range(len(languages)):
             Features[i][count].append(features)
             count += 1
 
+# Plot Colors in order Blue, Orange, Green, Red
 for numOfAvgFeatures in range(len(AvgFeatures)):
     for numOfStats in range(len(names)):
         plt.figure(numOfStats)
@@ -27,6 +28,5 @@ for numOfAvgFeatures in range(len(AvgFeatures)):
         for i in range(len(languages)):
             H, binEdges = numpy.histogram(Features[i][numOfStats + len(names) * numOfAvgFeatures], 20)
             binCentres = 0.5 * (binEdges[1:] + binEdges[:-1])
-            # Plot Colors in order Blue, Orange, Green, Red
             plt.plot(binCentres, H)
         plt.show()
