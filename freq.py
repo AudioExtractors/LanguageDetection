@@ -5,9 +5,10 @@ from matplotlib.mlab import find
 from scipy.signal import blackmanharris, fftconvolve
 from time import time
 import sys
-
+import os
 from scipy.io import wavfile
 from parabolic import parabolic
+import shutil
 
 
 def freq_from_crossings(sig, fs):
@@ -93,7 +94,11 @@ def freq_from_HPS(sig, fs):
         subplot(maxharms, 1, x)
         plot(log(c))
     show()
+def freq_from_path(path=""):
+    (fs,signal)=wavfile.read(path)
+    return (freq_from_fft(signal,fs),freq_from_autocorr(signal,fs))
 
+"""
 filename = "DNEW3/0-99/dutch_train1.wav"
 
 print 'Reading file "%s"\n' % filename
@@ -109,13 +114,31 @@ print 'Calculating frequency from zero crossings:',
 start_time = time()
 print '%f Hz' % freq_from_crossings(signal, fs)
 print 'Time elapsed: %.3f s\n' % (time() - start_time)
-
-print 'Calculating frequency from autocorrelation:',
-start_time = time()
-print '%f Hz' % freq_from_autocorr(signal, fs)
-print 'Time elapsed: %.3f s\n' % (time() - start_time)
-
+"""
+def filter():
+    gcount=0
+    tcount=0
+    for i in os.walk("DATA\\English"):
+        for f in i[2]:
+            (fs,signal)=wavfile.read(str(i[0])+"//"+str(f))
+            if( ".wav" not in f):
+                continue
+            fa=freq_from_autocorr(signal, fs)
+            ff=freq_from_fft(signal,fs)
+            if(ff>1 and fa<400 and fa>30):
+                if(gcount%100==0):
+                    dir=str(gcount)+"-"+str(gcount+99)
+                    os.mkdir("English\\"+dir+"\\")
+                shutil.copy(str(i[0])+"//"+str(f),"English\\"+dir+"\\"+"eng_train"+str(gcount)+".wav")
+                gcount=gcount+1
+            #else:
+            #    shutil.copy(str(i[0])+"//"+str(f),"DutchNoise\\"+str(tcount)+".wav")
+            tcount=tcount+1
+    print gcount,tcount
+print "Hello",freq_from_path("Trash//Dutch//400-499//dutch_train403.wav")
+"""
 print 'Calculating frequency from harmonic product spectrum:'
 start_time = time()
 # freq_from_HPS(signal, fs)
 print 'Time elapsed: %.3f s\n' % (time() - start_time)
+"""

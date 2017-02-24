@@ -1,5 +1,5 @@
 import os
-
+epoch=100
 base_dir = "Data"
 windowSize = 1000  # In number of frames
 windowHop = 500  # In number of frames
@@ -31,4 +31,9 @@ def getWindowSize():
 
 def getWindowHop():
     return windowHop
-
+def getEpoch():
+    return epoch
+def getFeatureSet():
+    return featureNames
+def getLanguages():
+    return languages

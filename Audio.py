@@ -3,7 +3,6 @@ import numpy
 from scipy.io import wavfile
 from pyAudioAnalysis import audioFeatureExtraction
 
-
 class Audio:
     def __init__(self, path):
         self.path = path
