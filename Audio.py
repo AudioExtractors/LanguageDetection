@@ -21,7 +21,7 @@ class Audio:
                                                                    AppConfig.getWindowHop())
         for frames in numpy.transpose(featureVector):
             self.singleFrame = []
-            for requiredFeature in AppConfig.featureNumbers:
+            for requiredFeature in AppConfig.getFeaturesNumbers():
                 self.singleFrame.append(frames[requiredFeature])
             self.allFrames.append(self.singleFrame)
         return numpy.array(self.allFrames)
