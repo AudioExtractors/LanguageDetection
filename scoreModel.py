@@ -15,9 +15,9 @@ class scoreModel:
         inputSize=0
         flag=0
         for language in self.languages:
-            samples=AudioIO.getSampleList(language)
+            samples=AudioIO.getTrainingSamples(language)
             for sample in samples:
-                featureVector=sample.getFeatureVectorNormalised()
+                featureVector=sample.getFeatureVector()
                 for frameFeature in featureVector:
                     if(inputSize>self.epoch):
                         flag=1

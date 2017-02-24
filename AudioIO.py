@@ -2,7 +2,7 @@ import os
 import tarfile
 import python_speech_features as psf
 from pydub import AudioSegment
-import scipy
+from scipy import signal
 import numpy as np
 from pydub.playback import play
 import scipy.io.wavfile as wavfile
@@ -11,6 +11,10 @@ from matplotlib.pyplot import plot,subplot,xlabel,ylabel,show,figure
 import matplotlib.pyplot as plt
 from scipy import fft,arange
 from python_speech_features import mfcc
+from AppConfig import *
+from pyAudioAnalysis import audioFeatureExtraction
+import Audio
+import AppConfig
 #TUTS
 #os.mkdir('')
 #os.mkdirs('')
@@ -36,6 +40,7 @@ def read(file):
 
 def spectrum(file):
     x=wavfile.read(file)
+
     y=x[1]
     Fs=x[0]
     n = len(y) # length of the signal
@@ -107,20 +112,38 @@ def MFCCExtract(file,num,color):
     plot(X,Y,color)
     plt.axis([0,50,-70,40])
     plt.grid(True)
+def spectrogramPlot(file,fig):
+    (fs,x)=wavfile.read(file)
+    plt.figure(fig)
+    Pxx, freqs, bins, im = plt.specgram(x, NFFT=1024, Fs=fs, noverlap=900)
+    plt.axis([1,4,0,1000])
+def getFeature():
 
+    (fs,signal)=wavfile.read(getFilePathTraining("de",80))
+    ft = audioFeatureExtraction.stFeatureExtraction(signal,fs,1000,500)
+    print 1/ft[0]
+def getTrainingSamples(language,max=900):
+    samples=[]
+    for i in range(max):
+        sample=Audio.Audio(AppConfig.getFilePathTraining(language,i))
+        samples.append(sample)
+    return samples
 if __name__ == "__main__":
-    file="DNEW3//0-99//dutch_train12.wav"
+    """file="DNEW3//1100-1199//dutch_train1119.wav"
     #read("DNEW//0-99//eng_train7.wav")
-    spectrum(file)
+    #spectrum(file)
     #filter()
-    """MFCCExtract(file,1,'rd')
+    MFCCExtract(file,1,'rd')
     file2="dataset2//prac.wav"
     #MFCCExtract(file2,1,'gd')
 
     file3="dataset2//prac2.wav"
-    MFCCExtract(file3,1,'bd')
+    #MFCCExtract(file3,1,'bd')
 
 
     file4="DNEW//100-199//eng_train145.wav"
-    MFCCExtract(file4,1,'go')"""
+    MFCCExtract(file4,1,'gd')"""
+    #spectrogramPlot("Trash//Dutch//400-499//dutch_train403.wav",1)
+    #spectrogramPlot("Trash//DutchNoise//29.wav",2)
+    getFeature()
     show()
