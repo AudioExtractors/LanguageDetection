@@ -18,7 +18,23 @@ class Classifier:
         """
         self.clf.fit(X,Y)
     def predict(self,feature):
-        return self.clf.predict(feature)
-
-
+        """
+        :param feature:
+        :return:list of subcanditates with probabilities
+        """
+        prediction_vector=self.clf.predict(feature)
+        label=dict()
+        total=len(prediction_vector)
+        for frame_prediction in prediction_vector:
+            if frame_prediction in label:
+                label[frame_prediction]+=1
+            else:
+                label[frame_prediction]=1
+        subcandidates=[]
+        for key in label:
+            tp=(float(label[key])/total,key)
+            subcandidates.append(tp)
+        subcandidates.sort()
+        subcandidates.reverse()
+        return subcandidates
 

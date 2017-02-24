@@ -7,9 +7,11 @@ class Audio:
         self.path = path
         self.singleFrame = []
         self.allFrames = []
+        self.index=path
         (self.fs, self.signal) = wavfile.read(path)
         self.noFrames=len(self.signal)
-
+    def getIndex(self):
+        return self.index
     def getFeatureVector(self):
         featureVector = audioFeatureExtraction.stFeatureExtraction(self.signal, self.fs, AppConfig.getWindowSize(),
                                                                    AppConfig.getWindowHop())
@@ -26,11 +28,11 @@ class Audio:
             if i>=8 and i<=20:
                 filteredFeatureVector.append(feature)
         self.featureVector=filteredFeatureVector
-        print type(featureVector)
+        self.featureVector=filteredFeatureVector
         return numpy.transpose(filteredFeatureVector)
     def getNoOfFrames(self):
         return self.noFrames
-"""X=Audio(AppConfig.getFilePathTraining("en",34))
+"""X=Audio(AppConfig.getFilePathTraining("en",100))
 print X
 FV=X.getFeatureVector()
 print FV

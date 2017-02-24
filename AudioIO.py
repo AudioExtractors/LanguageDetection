@@ -128,6 +128,12 @@ def getTrainingSamples(language,max=900):
         sample=Audio.Audio(AppConfig.getFilePathTraining(language,i))
         samples.append(sample)
     return samples
+def getTestSamples(language,max=900):
+    samples=[]
+    for i in range(max):
+        sample=Audio.Audio(AppConfig.getFilePathTest(language,i))
+        samples.append(sample)
+    return samples
 if __name__ == "__main__":
     """file="DNEW3//1100-1199//dutch_train1119.wav"
     #read("DNEW//0-99//eng_train7.wav")
