@@ -2,7 +2,7 @@ import os
 epoch = 50000  # must be greater than 2*contextWindow
 base_dir = "Data"
 test_base_dir = "Test"
-hiddenLayer = (100)
+hiddenLayer = (5, 2)
 windowSize = 400  # In number of frames
 windowHop = 200  # In number of frames
 languages = ["en", "de", "it", "es", "ru", "fr"]
