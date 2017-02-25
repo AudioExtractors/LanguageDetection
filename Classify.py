@@ -8,14 +8,15 @@ import numpy
 
 
 class Classify:
-    def __init__(self, hidden_layers=(5), epoch=100000):
+    def __init__(self):
         """
 
         :param hidden_layers:
         :param epoch:
         :return:
         """
-
+        hidden_layers = AppConfig.getHiddenLayer()
+        epoch = AppConfig.getEpoch()
         self.model = Sequential()
         if isinstance(hidden_layers, (collections.Sequence, numpy.ndarray)):
             self.model.add(
