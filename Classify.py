@@ -21,17 +21,21 @@ class Classify:
         if isinstance(hidden_layers, (collections.Sequence, numpy.ndarray)):
             self.model.add(
                 Dense(hidden_layers[0], activity_regularizer=activity_l2(),
-                      input_dim=AppConfig.getNumFeatures() * AppConfig.getContextWindowSize(), activation='relu'))
+                      input_dim=AppConfig.getNumFeatures() * AppConfig.getContextWindowSize(), activation='sigmoid'))
             # self.model.add(Dropout(0.3))
             for num in range(1, len(hidden_layers)):
-                self.model.add(Dense(hidden_layers[num], activation='relu'))
+                self.model.add(Dense(hidden_layers[num], activation='sigmoid'))
                 # self.model.add(Dropout(0.3))
         else:
+            # self.model.add(
+            #     Dense(hidden_layers, activity_regularizer=activity_l2(),
+            #           input_dim=13, activation='sigmoid'))
             self.model.add(
                 Dense(hidden_layers, activity_regularizer=activity_l2(),
-                      input_dim=AppConfig.getNumFeatures() * AppConfig.getContextWindowSize(), activation='relu'))
+                      input_dim=AppConfig.getNumFeatures() * AppConfig.getContextWindowSize(), activation='sigmoid'))
             # self.model.add(Dropout(0.3))
-        self.model.add(Dense(AppConfig.getNumLanguages(), activation='softmax'))
+        # self.model.add(Dense(2, activation='sigmoid'))
+        self.model.add(Dense(AppConfig.getNumLanguages(), activation='sigmoid'))
         self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
     def train(self, X, Y):
@@ -53,6 +57,14 @@ class Classify:
         prediction_vector = self.model.predict(feature)
         probability = dict()
         total = len(prediction_vector)
+        # For Sigmoid Neurons
+        for predictions in prediction_vector:
+            sum = 0
+            for values in predictions:
+                sum += values
+            for lang in range(len(predictions)):
+                predictions[lang] = predictions[lang] / sum
+        # end
         for predictions in prediction_vector:
             for lang in range(len(predictions)):
                 if lang in probability.keys():
@@ -71,4 +83,10 @@ class Classify:
 # Predict Usage for a single feature Vector:
 # print obj.predict(numpy.array([x_t[0]]))
 
+# o = Classify()
+# x_train = numpy.load("x_train1.npy")
+# y_train = numpy.load("y_train1.npy")
+# x_t = numpy.load("x_t1.npy")
+# o.train(x_train, y_train)
+# o.predict(x_t)
 
