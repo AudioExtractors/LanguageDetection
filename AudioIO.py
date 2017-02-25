@@ -161,5 +161,3 @@ if __name__ == "__main__":
     MFCCExtract(file4,1,'gd')"""
     #spectrogramPlot("Trash//Dutch//400-499//dutch_train403.wav",1)
     #spectrogramPlot("Trash//DutchNoise//29.wav",2)
-    getFeature()
-    show()
