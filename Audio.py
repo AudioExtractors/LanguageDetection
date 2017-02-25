@@ -12,6 +12,10 @@ class Audio:
         self.allFrames = []
         self.index = path
         (self.fs, self.signal) = wavfile.read(path)
+        if self.fs != 16000:
+            print "sampling Error.."
+            return
+
         self.contextFeatureVector=[]
 
         self.noFrames = len(self.signal)

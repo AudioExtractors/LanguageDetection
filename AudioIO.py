@@ -15,6 +15,7 @@ from AppConfig import *
 from pyAudioAnalysis import audioFeatureExtraction
 import Audio
 import AppConfig
+import random as rd
 #TUTS
 #os.mkdir('')
 #os.mkdirs('')
@@ -122,29 +123,79 @@ def getFeature():
     (fs,signal)=wavfile.read(getFilePathTraining("de",80))
     ft = audioFeatureExtraction.stFeatureExtraction(signal,fs,1000,500)
     print 1/ft[0]
-def getTrainingSamples(language,max=900,rng=(0,900)):
+def getTrainingSamples(language,rng=None,maxEpoch=AppConfig.getEpoch(),max=AppConfig.maxTrainingSamples,random="True"):
     samples=[]
+    error=60000
+    loadedFrames=0
+    maxFrames=(maxEpoch+error)*AppConfig.getWindowHop()
+    if random=="True":
+        if rng is None:
+            randomNumbers=rd.sample(range(0,AppConfig.maxTrainingSamples),max)
+        else:
+            randomNumbers=rd.sample(range(rng[0],min(AppConfig.maxTrainingSamples,rng[1])),min(max,rng[1]-rng[0]-1))
+        for i in randomNumbers:
+            randomSample=Audio.Audio(AppConfig.getFilePathTraining(language,i))
+            samples.append(randomSample)
+            loadedFrames+=randomSample.getNoOfFrames()
+            if loadedFrames>maxFrames:
+                break
+        return samples
     if rng is None:
         for i in range(max):
             sample=Audio.Audio(AppConfig.getFilePathTraining(language,i))
             samples.append(sample)
+            loadedFrames+=sample.getNoOfFrames()
+            if loadedFrames>maxFrames:
+                break
     else:
-        for i in range(rng[0],rng[1]):
+        for i in range(rng[0],min(rng[1],rng[0]+max)):
             sample=Audio.Audio(AppConfig.getFilePathTraining(language,i))
             samples.append(sample)
+            loadedFrames+=sample.getNoOfFrames()
+            if loadedFrames>maxFrames:
+                break
     return samples
-def getTestSamples(language,max=900,rng=(0,900)):
+def getTestSamples(language,rng=None,maxEpoch=AppConfig.getEpoch(),max=AppConfig.maxTestSamples,random="True"):
     samples=[]
+    loadedFrames=0
+    error=0
+    maxFrames=(maxEpoch+error)*AppConfig.getWindowHop()
+    if random=="True":
+        if rng is None:
+            randomNumbers=rd.sample(range(0,AppConfig.maxTestSamples),max)
+        else:
+            randomNumbers=rd.sample(range(rng[0],min(AppConfig.maxTestSamples,rng[1])),min(max,rng[1]-rng[0]-1))
+        for i in randomNumbers:
+            randomSample=Audio.Audio(AppConfig.getFilePathTest(language,i))
+            samples.append(randomSample)
+            loadedFrames+=randomSample.getNoOfFrames()
+            if loadedFrames>maxFrames:
+                break
+
+        return samples
     if rng is None:
         for i in range(max):
             sample=Audio.Audio(AppConfig.getFilePathTest(language,i))
             samples.append(sample)
+            loadedFrames+=sample.getNoOfFrames()
+            if loadedFrames>maxFrames:
+                break
     else:
-        for i in range(rng[0],rng[1]):
+        for i in range(rng[0],min(rng[1],rng[0]+max)):
             sample=Audio.Audio(AppConfig.getFilePathTest(language,i))
             samples.append(sample)
+            loadedFrames+=sample.getNoOfFrames()
+            if loadedFrames>maxFrames:
+                break
     return samples
 if __name__ == "__main__":
+
+    x=getTestSamples("de",random="True",rng=(500,700),max=3,maxEpoch=100000)
+    print len(x)
+    for i in x:
+        print i.getIndex()
+
+
     """file="DNEW3//1100-1199//dutch_train1119.wav"
     #read("DNEW//0-99//eng_train7.wav")
     #spectrum(file)

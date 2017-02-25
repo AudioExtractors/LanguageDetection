@@ -5,15 +5,17 @@ import Audio
 import AppConfig
 from matplotlib.pyplot import *
 import datetime
+import sys
+import Classify
 class scoreModel:
     def __init__(self,languages,featureSets,epoch):
-
 
         self.label=dict()
         self.languages=languages
         self.featureSets=featureSets
         self.epoch=epoch
-        self.classifier=Classifier.Classifier(AppConfig.getHiddenLayer(),AppConfig.getEpoch())
+        #self.classifier=Classifier.Classifier(AppConfig.getHiddenLayer(),AppConfig.getEpoch())
+        self.classifier=Classify.Classify()
         for i,language in enumerate(languages):
             self.label[language]=i
 
@@ -30,33 +32,49 @@ class scoreModel:
         Y=[]
         noOfFilesTrained=[]
         for language in self.languages:
+            print language
             inputSize=0
             flag=0
-            samples=AudioIO.getTrainingSamples(language)
+            samples=AudioIO.getTrainingSamples(language,random="False")
             ct=0
             for sample in samples:
                 featureVector=sample.getContextFeatureVector()
                 for frameFeature in featureVector:
-                    if(inputSize>=self.epoch):
+                    if inputSize>=self.epoch:
                         noOfFilesTrained.append((language,sample.getIndex()))
                         #languagesFeatures.append(X)
                         flag=1
                         break
                     X.append(frameFeature)
+                    #print type(X),type(x[0])
+                    #print (len(X)*len(X[0])*64)/float(1024*1024*8), "..MB"
                     Y.append(self.label.get(language))
                     inputSize+=1
                 if flag==1:
                     break
 
         #print X
+        print "Fetched"
         X=self.normaliseFeatureVector(X)
+        print "Normalised"
+        print X
+        self.assertFeatureVector(X,Y)
         #print X
         self.classifier.train(X,Y)
         return noOfFilesTrained
     def train(self):
         self.classifier.train(self.inputFeatureVector,self.inputClassVector)
 
-
+    def assertFeatureVector(self,X,Y):
+        if len(X)==len(Y):
+            print "len Assert Pass",len(X)
+        for frameFeature in X:
+            if frameFeature.shape!=X[0].shape:
+                print "Dimension Assert Fail"
+            for feature in frameFeature:
+                if not(feature>=0.0 and feature <=1.0):
+                    print "fail"
+        print "Dimension Assert Pas",X[0].shape
     def predict(self,audio):
         featureVector=audio.getContextFeatureVector()
         normFeatureVector=self.normaliseFeatureVector(featureVector)
@@ -140,10 +158,14 @@ class scoreModel:
         :return: list of percentage success with language
         """
         analysis=[]
+        bar_len = 60
         for language in self.languages:
             Total=AppConfig.getTestEpoch()
             success=0
+            print language
             for num in range(AppConfig.getTestEpoch()):
+                progress=num*100/Total
+                sys.stdout.write(str(progress)+" ")
                 subcandidates=self.predict(Audio.Audio(AppConfig.getFilePathTest(language,num)))
                 if subcandidates[0][1]==self.label[language]:
                     success+=1
@@ -174,7 +196,8 @@ b=datetime.datetime.now()
 c=b-a
 print c.seconds
 #X.train()
-print X.analyse()
+A=X.analyse()
+print A
 """
 X.plotFeature2D("en","Train",1,1,2,("b","o",0.5),100)
 X.plotFeature2D("it","Train",1,1,2,("g","o",0.3),100)
