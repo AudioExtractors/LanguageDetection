@@ -1,15 +1,14 @@
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation
+from keras.layers import Dense, Dropout
 from keras.regularizers import activity_l2
 from keras.utils import np_utils
+import collections
 import AppConfig
-import Audio
-import os
 import numpy
 
 
 class Classify:
-    def __init__(self, hidden_layers=(5, 2)):
+    def __init__(self, hidden_layers=(5), epoch=100000):
         """
 
         :param hidden_layers:
@@ -18,13 +17,20 @@ class Classify:
         """
 
         self.model = Sequential()
-        self.model.add(Dense(hidden_layers[0], activity_regularizer=activity_l2(), input_dim=AppConfig.numFeatures,
-                        activation='relu'))
-        self.model.add(Dropout(0.3))
-        for num in range(1, len(hidden_layers)):
-            self.model.add(Dense(hidden_layers[num], activation='relu'))
+        if isinstance(hidden_layers, (collections.Sequence, numpy.ndarray)):
+            self.model.add(
+                Dense(hidden_layers[0], activity_regularizer=activity_l2(), input_dim=AppConfig.getNumFeatures(),
+                      activation='relu'))
             self.model.add(Dropout(0.3))
-        self.model.add(Dense(2, activation='softmax'))
+            for num in range(1, len(hidden_layers)):
+                self.model.add(Dense(hidden_layers[num], activation='relu'))
+                self.model.add(Dropout(0.3))
+        else:
+            self.model.add(
+                Dense(hidden_layers, activity_regularizer=activity_l2(), input_dim=AppConfig.getNumFeatures(),
+                      activation='relu'))
+            self.model.add(Dropout(0.3))
+        self.model.add(Dense(AppConfig.getNumLanguages(), activation='softmax'))
         self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
     def train(self, X, Y):
@@ -34,7 +40,8 @@ class Classify:
         :param Y: and their corresponding class labels [1,2,3]
         :return: nothing
         """
-
+        # print np_utils.to_categorical(Y)
+        # To disable printing add verbose=0
         self.model.fit(X, np_utils.to_categorical(Y))
 
     def predict(self, feature):
@@ -43,22 +50,24 @@ class Classify:
         :return:list of subcanditates with probabilities
         """
         prediction_vector = self.model.predict(feature)
-        print prediction_vector
-        label = dict()
+        probability = dict()
         total = len(prediction_vector)
         for predictions in prediction_vector:
-            for frame_prediction in predictions:
-                if frame_prediction in label:
-                    label[frame_prediction] += 1
+            for lang in range(len(predictions)):
+                if lang in probability.keys():
+                    probability[lang] += predictions[lang]
                 else:
-                    label[frame_prediction] = 1
-        subcandidates = []
-        for key in label:
-            tp = (float(label[key])/total, key)
-            subcandidates.append(tp)
-        subcandidates.sort()
-        subcandidates.reverse()
-        return subcandidates
+                    probability[lang] = predictions[lang]
+        subCandidates = []
+        for key in probability:
+            tp = ((probability[key] / total), key)
+            subCandidates.append(tp)
+        subCandidates.sort()
+        subCandidates.reverse()
+        return subCandidates
 
-# Usage for a single feature Vector:
+
+# Predict Usage for a single feature Vector:
 # print obj.predict(numpy.array([x_t[0]]))
+
+
