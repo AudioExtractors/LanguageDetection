@@ -28,8 +28,8 @@ class Classify:
                 # self.model.add(Dropout(0.3))
         else:
             self.model.add(
-                Dense(hidden_layers, activity_regularizer=activity_l2(), input_dim=AppConfig.getNumFeatures(),
-                      activation='relu'))
+                Dense(hidden_layers, activity_regularizer=activity_l2(),
+                      input_dim=AppConfig.getNumFeatures() * AppConfig.getContextWindowSize(), activation='relu'))
             # self.model.add(Dropout(0.3))
         self.model.add(Dense(AppConfig.getNumLanguages(), activation='softmax'))
         self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
