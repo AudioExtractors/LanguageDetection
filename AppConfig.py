@@ -6,7 +6,6 @@ hiddenLayer = (5, 2)
 windowSize = 1000  # In number of frames
 windowHop = 500  # In number of frames
 languages = ["en", "de", "it", "es", "ru", "fr"]
-numFeatures = 34
 test_epoch = 200
 featureNames = ['Zero Crossing Rate', 'Energy', 'Entropy of Energy', 'Spectral Centroid', 'Spectral Spread',
                 'Spectral Entropy', 'Spectral Flux', 'Spectral Rolloff', 'MFCC 1', 'MFCC 2', 'MFCC 3', 'MFCC 4',
@@ -14,8 +13,10 @@ featureNames = ['Zero Crossing Rate', 'Energy', 'Entropy of Energy', 'Spectral C
                 'Chroma Vector 1', 'Chroma Vector 2', 'Chroma Vector 3', 'Chroma Vector 4', 'Chroma Vector 5',
                 'Chroma Vector 6', 'Chroma Vector 7', 'Chroma Vector 8', 'Chroma Vector 9', 'Chroma Vector 10',
                 'Chroma Vector 11', 'Chroma Vector 12', 'Chroma Deviation']
-# featureNumbers = [i for i in range(numFeatures)]  # Can be changed accordingly
-featureNumbers = [i for i in range(0,34)]
+
+featureNumbers = [i for i in range(8, 21)]  # Can be changed accordingly
+numFeatures = len(featureNumbers)
+# featureNumbers = [8]
 
 
 def getFilePathTraining(language, number):
@@ -30,6 +31,10 @@ def getFilePathTest(language, number):
     folder = str(range_start) + "-" + (str(range_start+99))
     path = os.path.join(test_base_dir, language, folder, language + "_test" + str(number) + ".wav")
     return path
+
+
+def getNumLanguages():
+    return len(languages)
 
 
 def getFeaturesNumbers():
