@@ -1,13 +1,14 @@
 import os
-epoch = 5
+epoch = 7
 base_dir = "Data"
 test_base_dir = "Test"
 hiddenLayer = (5, 2)
-windowSize = 1000  # In number of frames
-windowHop = 500  # In number of frames
+windowSize = 400  # In number of frames
+windowHop = 200  # In number of frames
 languages = ["en", "de", "it", "es", "ru", "fr"]
 numFeatures = 34
 test_epoch = 200
+contextWindowSize=10 #-x to + x frames
 featureNames = ['Zero Crossing Rate', 'Energy', 'Entropy of Energy', 'Spectral Centroid', 'Spectral Spread',
                 'Spectral Entropy', 'Spectral Flux', 'Spectral Rolloff', 'MFCC 1', 'MFCC 2', 'MFCC 3', 'MFCC 4',
                 'MFCC 5', 'MFCC 6', 'MFCC 7', 'MFCC 8', 'MFCC 9', 'MFCC 10', 'MFCC 11', 'MFCC 12', 'MFCC 13',
@@ -15,7 +16,7 @@ featureNames = ['Zero Crossing Rate', 'Energy', 'Entropy of Energy', 'Spectral C
                 'Chroma Vector 6', 'Chroma Vector 7', 'Chroma Vector 8', 'Chroma Vector 9', 'Chroma Vector 10',
                 'Chroma Vector 11', 'Chroma Vector 12', 'Chroma Deviation']
 # featureNumbers = [i for i in range(numFeatures)]  # Can be changed accordingly
-featureNumbers = [i for i in range(0,34)]
+featureNumbers = [i for i in range(8,23)]
 
 
 def getFilePathTraining(language, number):
