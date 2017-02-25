@@ -1,7 +1,7 @@
-from sklearn.neural_network import MLPClassifier
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation
 from keras.regularizers import activity_l2
+from keras.utils import np_utils
 import AppConfig
 import Audio
 import os
@@ -24,7 +24,7 @@ class Classify:
         for num in range(1, len(hidden_layers)):
             self.model.add(Dense(hidden_layers[num], activation='relu'))
             self.model.add(Dropout(0.3))
-        self.model.add(Dense(AppConfig.getNumLanguages(), activation='softmax'))
+        self.model.add(Dense(2, activation='softmax'))
         self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
     def train(self, X, Y):
@@ -34,7 +34,8 @@ class Classify:
         :param Y: and their corresponding class labels [1,2,3]
         :return: nothing
         """
-        self.model.fit(X, Y)
+
+        self.model.fit(X, np_utils.to_categorical(Y))
 
     def predict(self, feature):
         """
@@ -42,13 +43,15 @@ class Classify:
         :return:list of subcanditates with probabilities
         """
         prediction_vector = self.model.predict(feature)
+        print prediction_vector
         label = dict()
         total = len(prediction_vector)
-        for frame_prediction in prediction_vector:
-            if frame_prediction in label:
-                label[frame_prediction] += 1
-            else:
-                label[frame_prediction] = 1
+        for predictions in prediction_vector:
+            for frame_prediction in predictions:
+                if frame_prediction in label:
+                    label[frame_prediction] += 1
+                else:
+                    label[frame_prediction] = 1
         subcandidates = []
         for key in label:
             tp = (float(label[key])/total, key)
@@ -56,3 +59,6 @@ class Classify:
         subcandidates.sort()
         subcandidates.reverse()
         return subcandidates
+
+# Usage for a single feature Vector:
+# print obj.predict(numpy.array([x_t[0]]))
