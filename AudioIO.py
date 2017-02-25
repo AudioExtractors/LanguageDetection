@@ -122,17 +122,27 @@ def getFeature():
     (fs,signal)=wavfile.read(getFilePathTraining("de",80))
     ft = audioFeatureExtraction.stFeatureExtraction(signal,fs,1000,500)
     print 1/ft[0]
-def getTrainingSamples(language,max=900):
+def getTrainingSamples(language,max=900,rng=(0,900)):
     samples=[]
-    for i in range(max):
-        sample=Audio.Audio(AppConfig.getFilePathTraining(language,i))
-        samples.append(sample)
+    if rng is None:
+        for i in range(max):
+            sample=Audio.Audio(AppConfig.getFilePathTraining(language,i))
+            samples.append(sample)
+    else:
+        for i in range(rng[0],rng[1]):
+            sample=Audio.Audio(AppConfig.getFilePathTraining(language,i))
+            samples.append(sample)
     return samples
-def getTestSamples(language,max=900):
+def getTestSamples(language,max=900,rng=(0,900)):
     samples=[]
-    for i in range(max):
-        sample=Audio.Audio(AppConfig.getFilePathTest(language,i))
-        samples.append(sample)
+    if rng is None:
+        for i in range(max):
+            sample=Audio.Audio(AppConfig.getFilePathTest(language,i))
+            samples.append(sample)
+    else:
+        for i in range(rng[0],rng[1]):
+            sample=Audio.Audio(AppConfig.getFilePathTest(language,i))
+            samples.append(sample)
     return samples
 if __name__ == "__main__":
     """file="DNEW3//1100-1199//dutch_train1119.wav"

@@ -29,21 +29,13 @@ class Audio:
     def getNoOfFrames(self):
         return self.noFrames
 
-#     def getFeatureVector2(self):
-#         featureVector=audioFeatureExtraction.stFeatureExtraction(self.signal,self.fs,AppConfig.getWindowSize(),AppConfig.getWindowHop())
-#         filteredFeatureVector=[]
-#         for i,feature in enumerate(featureVector):
-#             if i>=8 and i<=20:
-#                 filteredFeatureVector.append(feature)
-#         self.featureVector=filteredFeatureVector
-#         self.featureVector=filteredFeatureVector
-#         return numpy.transpose(filteredFeatureVector)
-#
-# """X=Audio(AppConfig.getFilePathTraining("en",100))
-# print X
-# FV=X.getFeatureVector()
-# print FV
-# print FV.shape
-# FV2=X.getFeatureVector2()
-# print FV2
-# print FV2.shape"""
+X=Audio(AppConfig.getFilePathTraining("en",22))
+Z=X.getFeatureVector()
+"""X=Audio(AppConfig.getFilePathTraining("en",100))
+print X
+FV=X.getFeatureVector()
+print FV
+print FV.shape
+FV2=X.getFeatureVector2()
+print FV2
+print FV2.shape"""

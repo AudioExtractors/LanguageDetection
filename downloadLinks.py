@@ -4,7 +4,7 @@ import os,tarfile
 import shutil
 def extract():
     files=[]
-    for i in os.walk('Raw\\ItalianRawTest'):
+    for i in os.walk('Raw\\DutchRawTest'):
         for f in i[2]:
             files.append(str(i[0])+"\\"+f)
     L=len(files)
@@ -15,12 +15,12 @@ def extract():
         if(".tgz" not in f):
             continue
         tar=tarfile.open(f)
-        tar.extractall("Test\\it_raw")
+        tar.extractall("Test\\de_raw")
         print num,max
 
 def recompile():
     files=[]
-    for i in os.walk('Test\\it_raw'):
+    for i in os.walk('Test\\de_raw'):
         for f in i[2]:
             files.append(str(i[0])+"\\"+f)
     L=len(files)
@@ -33,8 +33,8 @@ def recompile():
             continue
         if(ct%100==0):
             dir=str(ct)+"-"+str(ct+99)
-            os.mkdir("Test\\it\\"+dir+"\\")
-        shutil.copy(f,"Test\\it\\"+dir+"\\"+"it_test"+str(ct)+".wav")
+            os.mkdir("Test\\de\\"+dir+"\\")
+        shutil.copy(f,"Test\\de\\"+dir+"\\"+"de_test"+str(ct)+".wav")
         print ct
         ct=ct+1
 def download():

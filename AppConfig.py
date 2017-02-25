@@ -15,7 +15,7 @@ featureNames = ['Zero Crossing Rate', 'Energy', 'Entropy of Energy', 'Spectral C
                 'Chroma Vector 6', 'Chroma Vector 7', 'Chroma Vector 8', 'Chroma Vector 9', 'Chroma Vector 10',
                 'Chroma Vector 11', 'Chroma Vector 12', 'Chroma Deviation']
 # featureNumbers = [i for i in range(numFeatures)]  # Can be changed accordingly
-featureNumbers = [8]
+featureNumbers = [i for i in range(0,34)]
 
 
 def getFilePathTraining(language, number):
