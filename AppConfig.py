@@ -1,5 +1,5 @@
 import os
-epoch = 50000#must be greater than 2*contextWindow
+epoch = 50000  # must be greater than 2*contextWindow
 base_dir = "Data"
 test_base_dir = "Test"
 hiddenLayer = (100)
@@ -17,7 +17,7 @@ featureNames = ['Zero Crossing Rate', 'Energy', 'Entropy of Energy', 'Spectral C
 
 
 # featureNumbers = [i for i in range(numFeatures)]  # Can be changed accordingly
-featureNumbers = [i for i in range(9,21)]
+featureNumbers = [i for i in range(8, 21)]
 
 
 def getFilePathTraining(language, number):
@@ -32,6 +32,10 @@ def getFilePathTest(language, number):
     folder = str(range_start) + "-" + (str(range_start+99))
     path = os.path.join(test_base_dir, language, folder, language + "_test" + str(number) + ".wav")
     return path
+
+
+def getNumFeatures():
+    return len(featureNumbers)
 
 
 def getNumLanguages():
