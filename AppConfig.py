@@ -16,7 +16,6 @@ featureNames = ['Zero Crossing Rate', 'Energy', 'Entropy of Energy', 'Spectral C
 
 featureNumbers = [i for i in range(8, 21)]  # Can be changed accordingly
 numFeatures = len(featureNumbers)
-# featureNumbers = [8]
 
 
 def getFilePathTraining(language, number):
