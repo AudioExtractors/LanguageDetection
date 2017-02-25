@@ -2,7 +2,7 @@ import os
 epoch = 100000  # must be greater than 2*contextWindow
 base_dir = "Data"
 test_base_dir = "Test"
-hiddenLayer = (40) # approx (2/3)*len(featureSet)*contextWindow
+hiddenLayer = (10) # approx (2/3)*len(featureSet)*contextWindow
 windowSize = 1000  # In number of frames
 windowHop = 500  # In number of frames
 languages = ["en", "de", "it", "es", "ru", "fr"]
@@ -18,7 +18,7 @@ featureNames = ['Zero Crossing Rate', 'Energy', 'Entropy of Energy', 'Spectral C
                 'Chroma Vector 11', 'Chroma Vector 12', 'Chroma Deviation']
 
 
-# featureNumbers = [i for i in range(numFeatures)]  # Can be changed accordingly
+# featureNumbers = [i for i in range(34)]  # Can be changed accordingly
 featureNumbers = [i for i in range(8, 21)]
 
 
