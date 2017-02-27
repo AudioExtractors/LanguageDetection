@@ -16,9 +16,9 @@ class scoreModel:
         self.languages = languages
         self.featureSets = featureSets
         self.epoch = epoch
-        # self.classifier=Classifier.Classifier(AppConfig.getHiddenLayer(), AppConfig.getEpoch())
+        # self.classifier = Classifier.Classifier(AppConfig.getHiddenLayer(), AppConfig.getEpoch())
         self.classifier = Classify.Classify()
-        for i,language in enumerate(languages):
+        for i, language in enumerate(languages):
             self.label[language] = i
 
     def populateFeatureVector(self):
@@ -72,7 +72,7 @@ class scoreModel:
             if frameFeature.shape != X[0].shape:
                 print "Dimension Assert Fail"
             for feature in frameFeature:
-                if not feature >= 0.0 and feature <=1.0:
+                if not feature >= 0.0 and feature <= 1.0:
                     print "fail"
         print "Dimension Assert Pas", X[0].shape
 
@@ -162,10 +162,10 @@ class scoreModel:
                 subcandidates = self.predict(Audio.Audio(AppConfig.getFilePathTest(language, num)))
                 if subcandidates[0][1] == self.label[language]:
                     success += 1
-            analysis.append((language, float(success*100)/Total))
+            analysis.append((language, float(success * 100) / Total))
         return analysis
 
-# ep=[3000,4000,5000,8000,10000,20000,50000]
+# ep = [3000,4000,5000,8000,10000,20000,50000]
 """ep=[9000]
 hl=[(5, 2),(6, 2),(7, 2)]
 J = []
