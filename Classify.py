@@ -2,6 +2,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from keras.regularizers import activity_l2
 from keras.utils import np_utils
+# from keras.layers.normalization import BatchNormalization  # Batch Normalization can be added
 import collections
 import AppConfig
 import numpy
@@ -10,7 +11,6 @@ import numpy
 class Classify:
     def __init__(self):
         """
-
         :param hidden_layers:
         :param epoch:
         :return:
@@ -23,9 +23,11 @@ class Classify:
                 Dense(hidden_layers[0], activity_regularizer=activity_l2(),
                       input_dim=AppConfig.getNumFeatures() * AppConfig.getContextWindowSize(), activation='sigmoid'))
             # self.model.add(Dropout(0.3))
+            # self.model.add(BatchNormalization())
             for num in range(1, len(hidden_layers)):
                 self.model.add(Dense(hidden_layers[num], activation='sigmoid'))
                 # self.model.add(Dropout(0.3))
+                # self.model.add(BatchNormalization())
         else:
             # self.model.add(
             #     Dense(hidden_layers, activity_regularizer=activity_l2(),
@@ -34,19 +36,24 @@ class Classify:
                 Dense(hidden_layers, activity_regularizer=activity_l2(),
                       input_dim=AppConfig.getNumFeatures() * AppConfig.getContextWindowSize(), activation='sigmoid'))
             # self.model.add(Dropout(0.3))
+            # self.model.add(BatchNormalization())
         # self.model.add(Dense(2, activation='sigmoid'))
         self.model.add(Dense(AppConfig.getNumLanguages(), activation='sigmoid'))
-        self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        # self.model.add(BatchNormalization())
+        self.model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'])  # adam gave
+        # better results, but adadelta used everywhere
 
     def train(self, X, Y):
         """
-
         :param X: list of feature vector [ [0.2,0.4,0.8] , [0.22,0.65,0.12] , [0.99,0.45,0.35] ]
         :param Y: and their corresponding class labels [1,2,3]
         :return: nothing
         """
         # print np_utils.to_categorical(Y)
         # To disable printing add verbose=0
+        # nb_epoch for number of epochs (Number of passes over complete Data)
+        # batch_size for batch size
+        # shuffle is true by default (shuffle batches)
         self.model.fit(X, np_utils.to_categorical(Y))
 
     def predict(self, feature):
@@ -54,16 +61,16 @@ class Classify:
         :param feature:
         :return:list of subcanditates with probabilities
         """
-        prediction_vector = self.model.predict(feature)
+        prediction_vector = self.model.predict_proba(feature, verbose=0)
         probability = dict()
         total = len(prediction_vector)
         # For Sigmoid Neurons
-        for predictions in prediction_vector:
-            sum = 0
-            for values in predictions:
-                sum += values
-            for lang in range(len(predictions)):
-                predictions[lang] = predictions[lang] / sum
+        # for predictions in prediction_vector:
+        #     sum = 0
+        #     for values in predictions:
+        #         sum += values
+        #     for lang in range(len(predictions)):
+        #         predictions[lang] = predictions[lang] / sum
         # end
         for predictions in prediction_vector:
             for lang in range(len(predictions)):

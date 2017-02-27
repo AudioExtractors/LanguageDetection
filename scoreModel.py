@@ -19,6 +19,8 @@ class scoreModel:
         self.epoch=epoch
         #self.classifier=Classifier.Classifier(AppConfig.getHiddenLayer(),AppConfig.getEpoch())
         self.classifier=Classify.Classify()
+        self.inputFeatureVector=[]#Feature Vector
+        self.inputClassVector=[]#ClassVector
         for i,language in enumerate(languages):
             self.label[language]=i
 
@@ -28,19 +30,17 @@ class scoreModel:
         """
         :return: return list of number of files trained for each language
         """
-        self.inputFeatureVector=[]#Feature Vector
-        self.inputClassVector=[]#ClassVector
+
         languagesFeatures=[]
         X=[]
         Y=[]
         noOfFilesTrained=[]
-
-
         for language in self.languages:
-            print language
+            print "Fetching Data for ",language
             inputSize=0
             flag=0
             samples=AudioIO.getTrainingSamples(language,random="False")
+            print "yes"
             ct=0
             for sample in samples:
                 featureVector=sample.getContextFeatureVector()
@@ -60,19 +60,87 @@ class scoreModel:
                     break
 
         #print X
-        print "Fetched"
+        print "Fetched Feature Vector.."
 
 
         X=self.normaliseFeatureVector(X)
-        print "Normalised"
-        print(process.memory_info().rss)/(1024*1024)
+        print "Normalised Feature Vector.."
+        print "current memory usage : ", (process.memory_info().rss)/(1024*1024)
         print X
         self.assertFeatureVector(X,Y)
         #print X
         self.classifier.train(X,Y)
         return noOfFilesTrained
+
+
     def train(self):
         self.classifier.train(self.inputFeatureVector,self.inputClassVector)
+
+
+    def dumpFeatureVector(self):
+        """
+        :return: return list of number of files trained for each language
+        """
+        languagesFeatures=[]
+        X=[]
+        Y=[]
+        noOfFilesTrained=[]
+        dumpLength=0
+        currentDumpSize=0
+        for language in self.languages:
+            print "Fetching Data for ",language
+            inputSize=0
+            flag=0
+            samples=AudioIO.getTrainingSamples(language,random="False")
+            ct=0
+            for sample in samples:
+                featureVector=sample.getContextFeatureVector()
+                print len(featureVector)
+                if len(featureVector)>0:
+                    featuresPerFrame=len(featureVector[0])
+                else:
+                    continue
+                for frameFeature in featureVector:
+                    print "Current DS",currentDumpSize
+                    print "Compare",inputSize,self.epoch
+                    if inputSize>=self.epoch:
+                        noOfFilesTrained.append((language,sample.getIndex()))
+                        #languagesFeatures.append(X)
+                        flag=1
+                        break
+                    if currentDumpSize + featuresPerFrame > AppConfig.trainingBatchSize:
+                        currentDumpSize=0
+                        print "Created dumpX_"+str(dumpLength)
+                        print "Created dumpY_"+str(dumpLength)
+                        np.save("dumpX_"+str(dumpLength),X)
+                        np.save("dumpY_"+str(dumpLength),Y)
+                        dumpLength+=1
+                        X=[]
+                        Y=[]
+                    currentDumpSize+=featuresPerFrame
+                    X.append(frameFeature)
+                    Y.append(self.label.get(language))
+                    inputSize+=1
+                if flag==1:
+                    break
+
+        #print X
+        print "Created dumpX_"+str(dumpLength)
+        print "Created dumpY_"+str(dumpLength)
+        np.save("dumpX_"+str(dumpLength),X)
+        np.save("dumpY_"+str(dumpLength),Y)
+        print "Created Dump.."
+
+        """
+        X=self.normaliseFeatureVector(X)
+        print "Normalised Feature Vector.."
+        print "current memory usage : ", (process.memory_info().rss)/(1024*1024)
+        print X
+        self.assertFeatureVector(X,Y)
+        #print X
+        self.classifier.train(X,Y)"""
+        return noOfFilesTrained
+
 
     def assertFeatureVector(self,X,Y):
         if len(X)==len(Y):
@@ -183,35 +251,11 @@ class scoreModel:
             analysis.append((language,float(success*100)/Total))
         return analysis
 
-#ep=[3000,4000,5000,8000,10000,20000,50000]
-"""ep=[9000]
-hl=[(5,2),(6,2),(7,2)]
-J=[]
-K=[]
-for i in ep:
-    AppConfig.epoch=i
-    X=scoreModel(["en","it"],["asd","sdf","asd"],AppConfig.getEpoch())
-    Y=X.train()
-    A=X.analyse()
-    print A
-    J.append(A[0][1])
-    K.append(A[1][1])
-    print "done epoch",i
-plot(ep,J,"r-")
-plot(ep,K,'g-')
-show()"""
 a=datetime.datetime.now()
 X = scoreModel(AppConfig.languages, ["asd", "sdf", "asd"], AppConfig.getEpoch())
-print X.populateFeatureVector()
+
+print X.dumpFeatureVector()
 b=datetime.datetime.now()
 c=b-a
 print c.seconds
-#X.train()
-A=X.analyse()
-print A
-"""
-X.plotFeature2D("en","Train",1,1,2,("b","o",0.5),100)
-X.plotFeature2D("it","Train",1,1,2,("g","o",0.3),100)
-X.plotFeature2D("en","Test",1,1,2,("pink","o",0.5),2)
-X.showPlot()"""
 
