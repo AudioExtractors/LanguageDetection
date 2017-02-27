@@ -79,7 +79,6 @@ class Classify:
         subCandidates.reverse()
         return subCandidates
 
-
 # Predict Usage for a single feature Vector:
 # print obj.predict(numpy.array([x_t[0]]))
 
