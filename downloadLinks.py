@@ -20,7 +20,7 @@ def extract():
 
 def recompile():
     files=[]
-    for i in os.walk('Test\\de_raw'):
+    for i in os.walk('Test\\en_raw'):
         for f in i[2]:
             files.append(str(i[0])+"\\"+f)
     L=len(files)
@@ -33,10 +33,31 @@ def recompile():
             continue
         if(ct%100==0):
             dir=str(ct)+"-"+str(ct+99)
-            os.mkdir("Test\\de\\"+dir+"\\")
-        shutil.copy(f,"Test\\de\\"+dir+"\\"+"de_test"+str(ct)+".wav")
+            os.mkdir("Test\\en\\"+dir+"\\")
+        shutil.copy(f,"Test\\en\\"+dir+"\\"+"en_test"+str(ct)+".wav")
         print ct
         ct=ct+1
+def recompile2():
+    files=[]
+    for i in os.walk('Data\\it_raw'):
+        for f in i[2]:
+            files.append(str(i[0])+"\\"+f)
+    L=len(files)
+    print files
+    ct=998
+    max=len(files)
+    dir="900-999"
+    for num,f in enumerate(files):
+
+        if(".wav" not in f):
+            continue
+        if(ct%100==0):
+            dir=str(ct)+"-"+str(ct+99)
+            os.mkdir("Data\\it\\"+dir+"\\")
+        shutil.copy(f,"Data\\it\\"+dir+"\\"+"it_train"+str(ct)+".wav")
+        print ct
+        ct=ct+1
+
 def download():
     f=open('english.txt')
     x=f.read()
@@ -48,5 +69,4 @@ def download():
         ct=ct+1
         print ct
 if __name__ == "__main__":
-    extract()
-    recompile()
+    recompile2()
