@@ -1,11 +1,11 @@
 import os
-epoch = 80000  # must be greater than 2*contextWindow
+epoch = 100000  # must be greater than 2*contextWindow
 base_dir = "Data"
 test_base_dir = "Test"
-hiddenLayer = (15) # approx (2/3)*len(featureSet)*contextWindow
+hiddenLayer = (10) # approx (2/3)*len(featureSet)*contextWindow
 windowSize = 1000  # In number of frames
 windowHop = 500  # In number of frames
-languages = ["en", "de", "it"]
+languages = ["en", "de"]
 test_epoch = 200
 contextWindowSize = 2  # -x/2 to +x/2 number of frames
 maxTrainingSamples = 900
