@@ -190,7 +190,7 @@ plot(ep,J,"r-")
 plot(ep,K,'g-')
 show()"""
 a=datetime.datetime.now()
-X=scoreModel(["en","it","de"],["asd","sdf","asd"],AppConfig.getEpoch())
+X = scoreModel(AppConfig.languages, ["asd", "sdf", "asd"], AppConfig.getEpoch())
 print X.populateFeatureVector()
 b=datetime.datetime.now()
 c=b-a

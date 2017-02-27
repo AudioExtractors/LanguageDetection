@@ -1,6 +1,6 @@
 import os
 import tarfile
-import python_speech_features as psf
+# import python_speech_features as psf
 from pydub import AudioSegment
 from scipy import signal
 import numpy as np
@@ -10,7 +10,6 @@ from pydub.playback import play
 from matplotlib.pyplot import plot,subplot,xlabel,ylabel,show,figure
 import matplotlib.pyplot as plt
 from scipy import fft,arange
-from python_speech_features import mfcc
 from AppConfig import *
 from pyAudioAnalysis import audioFeatureExtraction
 import Audio
