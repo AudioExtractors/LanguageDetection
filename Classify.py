@@ -47,6 +47,9 @@ class Classify:
         """
         # print np_utils.to_categorical(Y)
         # To disable printing add verbose=0
+        # nb_epoch for number of epochs (Number of passes over complete Data)
+        # batch_size for batch size
+        # shuffle is true by default (shuffle batches)
         self.model.fit(X, np_utils.to_categorical(Y))
 
     def predict(self, feature):
