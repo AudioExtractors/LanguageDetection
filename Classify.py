@@ -40,7 +40,7 @@ class Classify:
         # self.model.add(Dense(2, activation='sigmoid'))
         self.model.add(Dense(AppConfig.getNumLanguages(), activation='sigmoid'))
         # self.model.add(BatchNormalization())
-        self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        self.model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'])
 
     def train(self, X, Y):
         """
@@ -60,16 +60,16 @@ class Classify:
         :param feature:
         :return:list of subcanditates with probabilities
         """
-        prediction_vector = self.model.predict(feature)
+        prediction_vector = self.model.predict_proba(feature, verbose=0)
         probability = dict()
         total = len(prediction_vector)
         # For Sigmoid Neurons
-        for predictions in prediction_vector:
-            sum = 0
-            for values in predictions:
-                sum += values
-            for lang in range(len(predictions)):
-                predictions[lang] = predictions[lang] / sum
+        # for predictions in prediction_vector:
+        #     sum = 0
+        #     for values in predictions:
+        #         sum += values
+        #     for lang in range(len(predictions)):
+        #         predictions[lang] = predictions[lang] / sum
         # end
         for predictions in prediction_vector:
             for lang in range(len(predictions)):
