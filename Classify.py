@@ -40,7 +40,7 @@ class Classify:
         # self.model.add(Dense(2, activation='sigmoid'))
         self.model.add(Dense(AppConfig.getNumLanguages(), activation='sigmoid'))
         # self.model.add(BatchNormalization())
-        self.model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'])  # adam gave
+        self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])  # adam gave
         # better results, but adadelta used everywhere
 
     def train(self, X, Y):
