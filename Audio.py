@@ -3,8 +3,10 @@ import numpy
 import numpy as np
 from scipy.io import wavfile
 from pyAudioAnalysis import audioFeatureExtraction
-
-
+from pyAudioAnalysis import audioSegmentation as aS
+import matplotlib.pyplot as pp
+from pydub.playback import play
+from pydub import AudioSegment
 class Audio:
     def __init__(self, path):
         self.path = path
@@ -12,14 +14,23 @@ class Audio:
         self.allFrames = []
         self.index = path
         (self.fs, self.signal) = wavfile.read(path)
+        segments=aS.silenceRemoval(self.signal, self.fs, 0.020, 0.020, smoothWindow = 1.0, Weight = 0.4, plot = False)
+        self.voicedSignal=np.array([],dtype=np.int16)
+
+        for segment in segments:
+            voicedStart=int(segment[0]*self.fs)
+            voicedEnd=int(segment[1]*self.fs)
+            self.voicedSignal=np.append(self.voicedSignal,self.signal[voicedStart:voicedEnd])
+
+        """song = AudioSegment.from_wav(AppConfig.getFilePathTraining("en",23))
+        play((self.signal,self.fs))"""
+
         if self.fs != 16000:
             print "sampling Error.."
             return
 
         self.contextFeatureVector=[]
-
         self.noFrames = len(self.signal)
-
         self.featureVectorSize=-1
         self.contextFeatureVectorSize=-1
 
@@ -60,6 +71,8 @@ class Audio:
 
     def getNoOfFrames(self):
         return self.noFrames
+x=Audio(AppConfig.getFilePathTraining("en",34))
+#pp.show()
 """
 X=Audio(AppConfig.getFilePathTraining("en",22))
 Z=X.getContextFeatureVector()

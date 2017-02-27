@@ -7,6 +7,9 @@ from matplotlib.pyplot import *
 import datetime
 import sys
 import Classify
+import psutil
+import os
+process = psutil.Process(os.getpid())
 class scoreModel:
     def __init__(self,languages,featureSets,epoch):
 
@@ -31,6 +34,8 @@ class scoreModel:
         X=[]
         Y=[]
         noOfFilesTrained=[]
+
+
         for language in self.languages:
             print language
             inputSize=0
@@ -46,6 +51,7 @@ class scoreModel:
                         flag=1
                         break
                     X.append(frameFeature)
+                    print(process.memory_info().rss)/(1024*1024)
                     #print type(X),type(x[0])
                     #print (len(X)*len(X[0])*64)/float(1024*1024*8), "..MB"
                     Y.append(self.label.get(language))
@@ -55,8 +61,11 @@ class scoreModel:
 
         #print X
         print "Fetched"
+
+
         X=self.normaliseFeatureVector(X)
         print "Normalised"
+        print(process.memory_info().rss)/(1024*1024)
         print X
         self.assertFeatureVector(X,Y)
         #print X
@@ -84,9 +93,11 @@ class scoreModel:
 
     def normaliseFeatureVector(self,X):
         Xmin=np.min(X,axis=0)
+        print(process.memory_info().rss)/(1024*1024)
         Xmax=np.max(X,axis=0)
         delta=np.subtract(X,Xmin)
         diff=np.subtract(Xmax,Xmin)
+        print(process.memory_info().rss)/(1024*1024)
         for i,frame in enumerate(delta):
             for j,value in enumerate(frame):
                 if diff[j] == 0.0:

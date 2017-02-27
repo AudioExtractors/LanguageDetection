@@ -1,15 +1,15 @@
 import os
-epoch = 100000  # must be greater than 2*contextWindow
+epoch = 80000  # must be greater than 2*contextWindow
 base_dir = "Data"
 test_base_dir = "Test"
-hiddenLayer = (10) # approx (2/3)*len(featureSet)*contextWindow
-windowSize = 1000  # In number of frames
-windowHop = 500  # In number of frames
-languages = ["en", "de", "it", "es", "ru", "fr"]
+hiddenLayer = (170) # approx (2/3)*len(featureSet)*contextWindow
+windowSize = 500  # In number of frames
+windowHop = 250  # In number of frames
+languages = ["en", "it", "de"]
 test_epoch = 200
-contextWindowSize = 6  # -x/2 to +x/2 number of frames
-maxTrainingSamples = 900
-maxTestSamples = 900
+contextWindowSize = 10  # -x/2 to +x/2 number of frames
+maxTrainingSamples = 1200
+maxTestSamples = 1200
 featureNames = ['Zero Crossing Rate', 'Energy', 'Entropy of Energy', 'Spectral Centroid', 'Spectral Spread',
                 'Spectral Entropy', 'Spectral Flux', 'Spectral Rolloff', 'MFCC 1', 'MFCC 2', 'MFCC 3', 'MFCC 4',
                 'MFCC 5', 'MFCC 6', 'MFCC 7', 'MFCC 8', 'MFCC 9', 'MFCC 10', 'MFCC 11', 'MFCC 12', 'MFCC 13',
