@@ -60,18 +60,30 @@ class scoreModel:
 
         # print X
         print "Fetched Feature Vector.."
-
         X = self.normaliseFeatureVector(X)
         print "Normalised Feature Vector.."
         print "current memory usage : ", (process.memory_info().rss)/(1024*1024)
         print X
-        self.assertFeatureVector(X, Y)
-        # print X
-        self.classifier.train(X, Y)
+        self.assertFeatureVector(X,Y)
+        #print X
+        print type(X)
+        print Y
+        self.classifier.train(X,Y)
         return noOfFilesTrained
 
     def train(self):
-        self.classifier.train(self.inputFeatureVector, self.inputClassVector)
+
+        dumpSize=AudioIO.getFeatureDumpSize()
+        print "DumpSize: ",dumpSize
+        for i in range(dumpSize):
+            X=np.load("Dump//dumpX_"+str(i)+".npy")
+            y=np.load("Dump//dumpY_"+str(i)+".npy")
+            Y=[]
+            for label in y:
+                Y.append(label)
+            print Y
+            self.classifier.train(X,Y)
+
 
     def dumpFeatureVector(self):
         """
@@ -90,30 +102,27 @@ class scoreModel:
             samples = AudioIO.getTrainingSamples(language, random="False")
             ct = 0
             for sample in samples:
-                featureVector = sample.getContextFeatureVector()
-                print len(featureVector)
-                if len(featureVector) > 0:
-                    featuresPerFrame = len(featureVector[0])
+                featureVector=sample.getContextFeatureVector()
+                if len(featureVector)>0:
+                    featuresPerFrame=len(featureVector[0])
                 else:
                     continue
                 for frameFeature in featureVector:
-                    print "Current DS", currentDumpSize
-                    print "Compare", inputSize, self.epoch
-                    if inputSize >= self.epoch:
-                        noOfFilesTrained.append((language, sample.getIndex()))
-                        # languagesFeatures.append(X)
-                        flag = 1
+                    if inputSize>=self.epoch:
+                        noOfFilesTrained.append((language,sample.getIndex()))
+                        flag=1
                         break
                     if currentDumpSize + featuresPerFrame > AppConfig.trainingBatchSize:
-                        currentDumpSize = 0
+                        currentDumpSize=0
+                        X=self.normaliseFeatureVector(X)
                         print "Created dumpX_"+str(dumpLength)
                         print "Created dumpY_"+str(dumpLength)
-                        np.save("dumpX_"+str(dumpLength), X)
-                        np.save("dumpY_"+str(dumpLength), Y)
-                        dumpLength += 1
-                        X = []
-                        Y = []
-                    currentDumpSize += featuresPerFrame
+                        np.save("Dump\\dumpX_"+str(dumpLength),X)
+                        np.save("Dump\\dumpY_"+str(dumpLength),Y)
+                        dumpLength+=1
+                        X=[]
+                        Y=[]
+                    currentDumpSize+=featuresPerFrame
                     X.append(frameFeature)
                     Y.append(self.label.get(language))
                     inputSize += 1
@@ -122,8 +131,9 @@ class scoreModel:
         # print X
         print "Created dumpX_"+str(dumpLength)
         print "Created dumpY_"+str(dumpLength)
-        np.save("dumpX_"+str(dumpLength), X)
-        np.save("dumpY_"+str(dumpLength), Y)
+        X=self.normaliseFeatureVector(X)
+        np.save("Dump\\dumpX_"+str(dumpLength),X)
+        np.save("Dump\\dumpY_"+str(dumpLength),Y)
         print "Created Dump.."
 
         """
@@ -136,9 +146,9 @@ class scoreModel:
         self.classifier.train(X,Y)"""
         return noOfFilesTrained
 
-    def assertFeatureVector(self, X, Y):
-        if len(X) == len(Y):
-            print "len Assert Pass", len(X)
+    def assertFeatureVector(self,X,Y):
+        if len(X)==len(Y):
+            print "len Assert Pass",len(X)
         for frameFeature in X:
             if frameFeature.shape != X[0].shape:
                 print "Dimension Assert Fail"
@@ -153,12 +163,13 @@ class scoreModel:
         return self.classifier.predict(normFeatureVector)
         # return self.classifier.predict(featureVector)
 
-    def normaliseFeatureVector(self, X):
-        Xmin = np.min(X, axis=0)
-        print(process.memory_info().rss)/(1024*1024)
-        Xmax = np.max(X, axis=0)
-        delta = np.subtract(X, Xmin)
-        diff = np.subtract(Xmax, Xmin)
+    def normaliseFeatureVector(self,X):
+        Xmin=np.min(X,axis=0)
+        #print(process.memory_info().rss)/(1024*1024)
+        Xmax=np.max(X,axis=0)
+        delta=np.subtract(X,Xmin)
+        diff=np.subtract(Xmax,Xmin)
+
         print(process.memory_info().rss)/(1024*1024)
         for i, frame in enumerate(delta):
             for j, value in enumerate(frame):
@@ -240,8 +251,10 @@ class scoreModel:
 
 a = datetime.datetime.now()
 X = scoreModel(AppConfig.languages, ["asd", "sdf", "asd"], AppConfig.getEpoch())
-
-print X.dumpFeatureVector()
-b = datetime.datetime.now()
-c = b-a
+X.populateFeatureVector()
+#X.dumpFeatureVector()
+#print AppConfig.getNumFeatures()*AppConfig.getContextWindowSize()
+X.train()
+b=datetime.datetime.now()
+c=b-a
 print c.seconds

@@ -124,9 +124,9 @@ def getFeature():
     print 1/ft[0]
 def getTrainingSamples(language,rng=None,maxEpoch=AppConfig.getEpoch(),max=AppConfig.maxTrainingSamples,random="True"):
     samples=[]
-    error=60000
+    error=10
     loadedFrames=0
-    maxFrames=(maxEpoch+error)*AppConfig.getWindowHop()
+    maxFrames=(maxEpoch)*(AppConfig.getWindowHop()+error)
     if random=="True":
         if rng is None:
             randomNumbers=rd.sample(range(0,AppConfig.maxTrainingSamples),max)
@@ -157,8 +157,8 @@ def getTrainingSamples(language,rng=None,maxEpoch=AppConfig.getEpoch(),max=AppCo
 def getTestSamples(language,rng=None,maxEpoch=AppConfig.getEpoch(),max=AppConfig.maxTestSamples,random="True"):
     samples=[]
     loadedFrames=0
-    error=0
-    maxFrames=(maxEpoch+error)*AppConfig.getWindowHop()
+    error=10
+    maxFrames=(maxEpoch)*(AppConfig.getWindowHop()+error)
     if random=="True":
         if rng is None:
             randomNumbers=rd.sample(range(0,AppConfig.maxTestSamples),max)
@@ -187,13 +187,22 @@ def getTestSamples(language,rng=None,maxEpoch=AppConfig.getEpoch(),max=AppConfig
             if loadedFrames>maxFrames:
                 break
     return samples
+def getFeatureDumpSize():
+    dumpList=[]
+    for i in os.walk("Dump"):
+        print i[0],i[2]
+        for dumps in i[2]:
+            dumpList.append(i[0]+"\\"+dumps)
+    return len(dumpList)/2
+
 if __name__ == "__main__":
 
+    """
     x=getTestSamples("de",random="True",rng=(500,700),max=3,maxEpoch=100000)
     print len(x)
     for i in x:
         print i.getIndex()
-
+    """
 
     """file="DNEW3//1100-1199//dutch_train1119.wav"
     #read("DNEW//0-99//eng_train7.wav")
