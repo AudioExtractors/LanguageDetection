@@ -14,18 +14,15 @@ class Audio:
         self.singleFrame = []
         self.allFrames = []
         self.index = path
-        (self.fs, self.signal) = wavfile.read(path)
-        segments=aS.silenceRemoval(self.signal, self.fs, 0.020, 0.020, smoothWindow = 1.0, Weight = 0.4, plot = False)
+        (self.fs, signal) = wavfile.read(path)
+        segments=aS.silenceRemoval(signal, self.fs, 0.020, 0.020, smoothWindow = 1.0, Weight = 0.4, plot = False)
+        signal=[]
         self.voicedSignal=np.array([],dtype=np.int16)
-
         for segment in segments:
             voicedStart=int(segment[0]*self.fs)
             voicedEnd=int(segment[1]*self.fs)
-            self.voicedSignal=np.append(self.voicedSignal,self.signal[voicedStart:voicedEnd])
-
-        """song = AudioSegment.from_wav(AppConfig.getFilePathTraining("en",23))
-        play((self.signal,self.fs))"""
-
+            self.voicedSignal=np.append(self.voicedSignal,signal[voicedStart:voicedEnd])
+        self.signal=self.voicedSignal
         if self.fs != 16000:
             print "sampling Error.."
             return
@@ -57,6 +54,7 @@ class Audio:
         Deltas = numpy.transpose(Deltas)
         Deltas2 = numpy.transpose(Deltas2)
         featureVector = []
+
         for frames in range(0, len(featureVectorTemp)):
             Temp = numpy.append(featureVectorTemp[frames], Deltas[frames])
             Temp = numpy.append(Temp, Deltas2[frames])
@@ -93,3 +91,4 @@ class Audio:
 
     def getNoOfFrames(self):
         return self.noFrames
+G=Audio(AppConfig.getFilePathTraining("en",22))
