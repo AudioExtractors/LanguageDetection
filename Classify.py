@@ -1,7 +1,7 @@
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from keras.regularizers import activity_l2
-from keras.utils import np_utils
+# from keras.utils import np_utils
 # from keras.layers.normalization import BatchNormalization  # Batch Normalization can be added
 import collections
 import AppConfig
@@ -54,7 +54,13 @@ class Classify:
         # nb_epoch for number of epochs (Number of passes over complete Data)
         # batch_size for batch size
         # shuffle is true by default (shuffle batches)
-        self.model.fit(X, np_utils.to_categorical(Y))
+        output = []
+        for outputs in Y:
+            y = numpy.zeros((AppConfig.getNumLanguages(),), dtype=numpy.int)
+            y[outputs] = 1
+            output.append(y)
+        output = numpy.array(output)
+        self.model.fit(X, output)
 
     def predict(self, feature):
         """
