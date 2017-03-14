@@ -101,10 +101,9 @@ class Audio:
     def makeAverageWindows(self,languageFeature,averageFramesPerSample,std=False):
         averageFeature=[]
         noOfFrames=len(languageFeature)
-        averagingWindowSize=noOfFrames/averageFramesPerSample
+        averagingWindowSize=max(1,noOfFrames/averageFramesPerSample)
         start=0
         end=averagingWindowSize
-
         for i in range(noOfFrames):
             if start >= noOfFrames:
                 break

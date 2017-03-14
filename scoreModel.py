@@ -94,9 +94,7 @@ class scoreModel:
         """
         languagesFeatures = []
         underFetching=True
-
         noOfFilesTrained = []
-
         for language in self.languages:
             X = []
             Y = []
@@ -110,7 +108,10 @@ class scoreModel:
             ct = 0
             gt=0
             for sample in samples:
+                print ct
+                ct=ct+1
                 featureVector=sample.getAverageFeatureVector(std=True)
+                print featureVector.shape
                 if len(featureVector)>0:
                     featuresPerFrame=len(featureVector[0])
                 else:
@@ -147,15 +148,6 @@ class scoreModel:
             if underFetching==True:
                 print "Under Fetched Data Samples"
         # print X
-
-        """
-        X=self.normaliseFeatureVector(X)
-        print "Normalised Feature Vector.."
-        print "current memory usage : ", (process.memory_info().rss)/(1024*1024)
-        print X
-        self.assertFeatureVector(X,Y)
-        #print X
-        self.classifier.train(X,Y)"""
         return noOfFilesTrained
 
     def assertFeatureVector(self,X,Y):
@@ -256,6 +248,7 @@ class scoreModel:
                 if subcandidates[0][1] == self.label[language]:
                     success += 1
             analysis.append((language, float(success*100)/Total))
+            print ""
         return analysis
 
 a = datetime.datetime.now()
