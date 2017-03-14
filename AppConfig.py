@@ -1,16 +1,18 @@
 import os
-epoch = 800  # must be greater than 2*contextWindow
+trainingDataSize = 1100  # must be greater than 2*contextWindow
 base_dir = "Data"
 test_base_dir = "Test"
-hiddenLayer = (10)  # approx (2/3)*len(featureSet)*contextWindow
-windowSize = 1000  # In number of frames
-windowHop = 500  # In number of frames
+dump_base_dir="Dump"
+hiddenLayer = (20)  # approx (2/3)*len(featureSet)*contextWindow
+windowSize = 700  # In number of frames
+windowHop = 350  # In number of frames
 languages = ["en", "de"]
 test_epoch = 200
-contextWindowSize = 2  # -x/2 to +x/2 number of frames
-maxTrainingSamples = 900
-maxTestSamples = 900
-trainingBatchSize=78*1000 #78 features * 100 samples
+contextWindowSize = 1  # -x/2 to +x/2 number of frames
+maxTrainingSamples = 1200
+maxTestSamples = 300
+trainingBatchSize=78*10000 #78 features * 100 samples
+averageFramesPerSample=1 #each clip treated as one sample by average out
 featureNames = ['Zero Crossing Rate', 'Energy', 'Entropy of Energy', 'Spectral Centroid', 'Spectral Spread',
                 'Spectral Entropy', 'Spectral Flux', 'Spectral Rolloff', 'MFCC 1', 'MFCC 2', 'MFCC 3', 'MFCC 4',
                 'MFCC 5', 'MFCC 6', 'MFCC 7', 'MFCC 8', 'MFCC 9', 'MFCC 10', 'MFCC 11', 'MFCC 12', 'MFCC 13',
@@ -45,7 +47,9 @@ def getFilePathTest(language, number):
 
 
 def getNumFeatures():
-    return len(featureNumbers)
+    return 78
+
+    #return len(featureNumbers)
 
 
 def getNumLanguages():
@@ -64,8 +68,8 @@ def getWindowHop():
     return windowHop
 
 
-def getEpoch():
-    return epoch
+def getTrainingDataSize():
+    return trainingDataSize
 
 
 def getFeatureSet():

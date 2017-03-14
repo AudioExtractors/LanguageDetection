@@ -50,7 +50,6 @@ class scoreModel:
                         flag = 1
                         break
                     X.append(frameFeature)
-                    print(process.memory_info().rss)/(1024*1024)
                     # print type(X),type(x[0])
                     # print (len(X)*len(X[0])*64)/float(1024*1024*8), "..MB"
                     Y.append(self.label.get(language))
@@ -63,26 +62,30 @@ class scoreModel:
         X = self.normaliseFeatureVector(X)
         print "Normalised Feature Vector.."
         print "current memory usage : ", (process.memory_info().rss)/(1024*1024)
-        print X
         self.assertFeatureVector(X,Y)
         #print X
-        print type(X)
-        print Y
-        self.classifier.train(X,Y)
+        """self.classifier.train(X,Y)"""
         return noOfFilesTrained
 
     def train(self):
 
         dumpSize=AudioIO.getFeatureDumpSize()
         print "DumpSize: ",dumpSize
+
         for i in range(dumpSize):
-            X=np.load("Dump//dumpX_"+str(i)+".npy")
-            y=np.load("Dump//dumpY_"+str(i)+".npy")
-            Y=[]
-            for label in y:
-                Y.append(label)
-            print Y
-            self.classifier.train(X,Y)
+            combineDumpLanguageFeature=np.array([])
+            combineDumpLanguageLabel=np.array([])
+            for language in self.languages:
+                X=np.load("Dump//dumpX_"+language+str(i)+".npy")
+                Y=np.load("Dump//dumpY_"+language+str(i)+".npy")
+                if len(combineDumpLanguageFeature)==0:
+                    combineDumpLanguageFeature=X
+                    combineDumpLanguageLabel=Y
+                else:
+                    combineDumpLanguageFeature=np.vstack((combineDumpLanguageFeature,X))
+                    combineDumpLanguageLabel=np.concatenate((combineDumpLanguageLabel,Y))
+            print combineDumpLanguageLabel
+            self.classifier.train(combineDumpLanguageFeature,combineDumpLanguageLabel)
 
 
     def dumpFeatureVector(self):
@@ -90,35 +93,45 @@ class scoreModel:
         :return: return list of number of files trained for each language
         """
         languagesFeatures = []
-        X = []
-        Y = []
+        underFetching=True
+
         noOfFilesTrained = []
-        dumpLength = 0
-        currentDumpSize = 0
+
         for language in self.languages:
+            X = []
+            Y = []
+            dumpLength = 0
+            currentDumpSize = 0
             print "Fetching Data for ", language
             inputSize = 0
             flag = 0
             samples = AudioIO.getTrainingSamples(language, random="False")
+            print "current memory usage : ", (process.memory_info().rss)/(1024*1024)
             ct = 0
+            gt=0
             for sample in samples:
-                featureVector=sample.getContextFeatureVector()
+                featureVector=sample.getAverageFeatureVector(std=True)
                 if len(featureVector)>0:
                     featuresPerFrame=len(featureVector[0])
                 else:
                     continue
                 for frameFeature in featureVector:
                     if inputSize>=self.epoch:
+                        underFetching=False
+                        print "Created dump:-"+str(dumpLength)
+                        X=self.normaliseFeatureVector(X)
+                        np.save("Dump\\dumpX_"+language+str(dumpLength),X)
+                        np.save("Dump\\dumpY_"+language+str(dumpLength),Y)
+                        print "Created All Dumps.."
                         noOfFilesTrained.append((language,sample.getIndex()))
                         flag=1
                         break
                     if currentDumpSize + featuresPerFrame > AppConfig.trainingBatchSize:
                         currentDumpSize=0
                         X=self.normaliseFeatureVector(X)
-                        print "Created dumpX_"+str(dumpLength)
-                        print "Created dumpY_"+str(dumpLength)
-                        np.save("Dump\\dumpX_"+str(dumpLength),X)
-                        np.save("Dump\\dumpY_"+str(dumpLength),Y)
+                        print "Created dump:-"+language+str(dumpLength)
+                        np.save("Dump\\dumpX_"+language+str(dumpLength),X)
+                        np.save("Dump\\dumpY_"+language+str(dumpLength),Y)
                         dumpLength+=1
                         X=[]
                         Y=[]
@@ -128,13 +141,12 @@ class scoreModel:
                     inputSize += 1
                 if flag == 1:
                     break
+            print "current memory usage :1", (process.memory_info().rss)/(1024*1024)
+            samples=[]
+            print "current memory usage :2", (process.memory_info().rss)/(1024*1024)
+            if underFetching==True:
+                print "Under Fetched Data Samples"
         # print X
-        print "Created dumpX_"+str(dumpLength)
-        print "Created dumpY_"+str(dumpLength)
-        X=self.normaliseFeatureVector(X)
-        np.save("Dump\\dumpX_"+str(dumpLength),X)
-        np.save("Dump\\dumpY_"+str(dumpLength),Y)
-        print "Created Dump.."
 
         """
         X=self.normaliseFeatureVector(X)
@@ -158,19 +170,16 @@ class scoreModel:
         print "Dimension Assert Pas", X[0].shape
 
     def predict(self, audio):
-        featureVector = audio.getContextFeatureVector()
-        normFeatureVector = self.normaliseFeatureVector(featureVector)
-        return self.classifier.predict(normFeatureVector)
+        featureVector = audio.getAverageFeatureVector(std=True)
+        #normFeatureVector = self.normaliseFeatureVector(featureVector)
+        return self.classifier.predict(featureVector)
         # return self.classifier.predict(featureVector)
 
     def normaliseFeatureVector(self,X):
         Xmin=np.min(X,axis=0)
-        #print(process.memory_info().rss)/(1024*1024)
         Xmax=np.max(X,axis=0)
         delta=np.subtract(X,Xmin)
         diff=np.subtract(Xmax,Xmin)
-
-        print(process.memory_info().rss)/(1024*1024)
         for i, frame in enumerate(delta):
             for j, value in enumerate(frame):
                 if diff[j] == 0.0:
@@ -250,11 +259,12 @@ class scoreModel:
         return analysis
 
 a = datetime.datetime.now()
-X = scoreModel(AppConfig.languages, ["asd", "sdf", "asd"], AppConfig.getEpoch())
-X.populateFeatureVector()
+X = scoreModel(AppConfig.languages, ["asd", "sdf", "asd"], AppConfig.getTrainingDataSize())
+#X.populateFeatureVector()
 #X.dumpFeatureVector()
 #print AppConfig.getNumFeatures()*AppConfig.getContextWindowSize()
 X.train()
 b=datetime.datetime.now()
 c=b-a
 print c.seconds
+print X.analyse()

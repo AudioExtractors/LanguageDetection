@@ -122,11 +122,8 @@ def getFeature():
     (fs,signal)=wavfile.read(getFilePathTraining("de",80))
     ft = audioFeatureExtraction.stFeatureExtraction(signal,fs,1000,500)
     print 1/ft[0]
-def getTrainingSamples(language,rng=None,maxEpoch=AppConfig.getEpoch(),max=AppConfig.maxTrainingSamples,random="True"):
+def getTrainingSamples(language, rng=None, maxEpoch=AppConfig.getTrainingDataSize(), max=AppConfig.maxTrainingSamples, random="True"):
     samples=[]
-    error=10
-    loadedFrames=0
-    maxFrames=(maxEpoch)*(AppConfig.getWindowHop()+error)
     if random=="True":
         if rng is None:
             randomNumbers=rd.sample(range(0,AppConfig.maxTrainingSamples),max)
@@ -135,26 +132,17 @@ def getTrainingSamples(language,rng=None,maxEpoch=AppConfig.getEpoch(),max=AppCo
         for i in randomNumbers:
             randomSample=Audio.Audio(AppConfig.getFilePathTraining(language,i))
             samples.append(randomSample)
-            loadedFrames+=randomSample.getNoOfFrames()
-            if loadedFrames>maxFrames:
-                break
         return samples
     if rng is None:
         for i in range(max):
             sample=Audio.Audio(AppConfig.getFilePathTraining(language,i))
             samples.append(sample)
-            loadedFrames+=sample.getNoOfFrames()
-            if loadedFrames>maxFrames:
-                break
     else:
         for i in range(rng[0],min(rng[1],rng[0]+max)):
             sample=Audio.Audio(AppConfig.getFilePathTraining(language,i))
             samples.append(sample)
-            loadedFrames+=sample.getNoOfFrames()
-            if loadedFrames>maxFrames:
-                break
     return samples
-def getTestSamples(language,rng=None,maxEpoch=AppConfig.getEpoch(),max=AppConfig.maxTestSamples,random="True"):
+def getTestSamples(language, rng=None, maxEpoch=AppConfig.getTrainingDataSize(), max=AppConfig.maxTestSamples, random="True"):
     samples=[]
     loadedFrames=0
     error=10
@@ -193,7 +181,7 @@ def getFeatureDumpSize():
         print i[0],i[2]
         for dumps in i[2]:
             dumpList.append(i[0]+"\\"+dumps)
-    return len(dumpList)/2
+    return len(dumpList)/(2*AppConfig.getNumLanguages())
 
 if __name__ == "__main__":
 

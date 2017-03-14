@@ -16,7 +16,6 @@ class Audio:
         self.index = path
         (self.fs, signal) = wavfile.read(path)
         segments=aS.silenceRemoval(signal, self.fs, 0.020, 0.020, smoothWindow = 1.0, Weight = 0.4, plot = False)
-        signal=[]
         self.voicedSignal=np.array([],dtype=np.int16)
         for segment in segments:
             voicedStart=int(segment[0]*self.fs)
@@ -72,7 +71,7 @@ class Audio:
         featureVector = self.getFeatureVector()
         contextFeatureVector = self.makeContextWindows(featureVector)
         self.contextFeatureVectorSize = contextFeatureVector.shape
-        self.contextFeatureVector = contextFeatureVector
+        #self.contextFeatureVector = contextFeatureVector   commented to save memory
         return contextFeatureVector
 
     def makeContextWindows(self, languageFeature):
@@ -89,6 +88,43 @@ class Audio:
         contextFeature = np.array(contextFeature)
         return contextFeature
 
+    def getAverageFeatureVector(self,std=False):#std true means standard deviation to be included as well
+        featureVector=self.getFeatureVector()
+        averageFeatureVector=self.makeAverageWindows(featureVector,AppConfig.averageFramesPerSample)
+        if std==True:
+            stdFeatureVector=self.makeAverageWindows(featureVector,AppConfig.averageFramesPerSample,std=True)
+            if averageFeatureVector.shape != stdFeatureVector.shape:
+                print "Average Features cannot be concatenated because of shape error"
+            averageFeatureVector=np.concatenate((averageFeatureVector,stdFeatureVector),axis=1)
+        return averageFeatureVector
+
+    def makeAverageWindows(self,languageFeature,averageFramesPerSample,std=False):
+        averageFeature=[]
+        noOfFrames=len(languageFeature)
+        averagingWindowSize=noOfFrames/averageFramesPerSample
+        start=0
+        end=averagingWindowSize
+
+        for i in range(noOfFrames):
+            if start >= noOfFrames:
+                break
+            averagingWindow = languageFeature[start:end]
+            if std==True:
+                averagingWindow = averagingWindow.mean(axis=0)
+            else:
+                averagingWindow = averagingWindow.std(axis=0)
+
+            averageFeature.append(averagingWindow)
+            start = end
+            if start+2*averagingWindowSize>=noOfFrames:
+                end=noOfFrames
+            else:
+                end = start + averagingWindowSize
+        averageFeature = np.array(averageFeature)
+        return averageFeature
+
     def getNoOfFrames(self):
         return self.noFrames
-G=Audio(AppConfig.getFilePathTraining("en",22))
+"""G=Audio(AppConfig.getFilePathTraining("en",22))
+x=np.array([[1,2,3],[2,3,4],[10,18,17],[100,2,3],[1,6,7]])
+print G.makeAverageWindows(x,2)"""

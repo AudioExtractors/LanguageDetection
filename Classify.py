@@ -6,8 +6,9 @@ from keras.regularizers import activity_l2
 import collections
 import AppConfig
 import numpy
-
-
+import os
+import AudioIO
+from keras.utils import np_utils
 class Classify:
     def __init__(self):
         """
@@ -16,7 +17,7 @@ class Classify:
         :return:
         """
         hidden_layers = AppConfig.getHiddenLayer()
-        epoch = AppConfig.getEpoch()
+        epoch = AppConfig.getTrainingDataSize()
         self.model = Sequential()
         if isinstance(hidden_layers, (collections.Sequence, numpy.ndarray)):
             self.model.add(
@@ -42,6 +43,13 @@ class Classify:
         # self.model.add(BatchNormalization())
         self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])  # adam gave
         # better results, but adadelta used everywhere
+    def generator(self):
+        sz=AudioIO.getFeatureDumpSize()
+        for i in range(sz-1):
+            X=numpy.load("Dump//dumpX_"+str(i)+".npy")
+            Y=numpy.load("Dump//dumpY_"+str(i)+".npy")
+            Ydash=[]
+            yield X,np_utils.to_categorical(Y,2)
 
     def train(self, X, Y):
         """
@@ -54,12 +62,15 @@ class Classify:
         # nb_epoch for number of epochs (Number of passes over complete Data)
         # batch_size for batch size
         # shuffle is true by default (shuffle batches)
+        """self.model.fit_generator(self.generator(),
+        samples_per_epoch=50000, nb_epoch=10)"""
         output = []
         for outputs in Y:
             y = numpy.zeros((AppConfig.getNumLanguages(),), dtype=numpy.int)
             y[outputs] = 1
             output.append(y)
         output = numpy.array(output)
+
         self.model.fit(X, output)
 
     def predict(self, feature):
