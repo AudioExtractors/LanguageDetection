@@ -7,27 +7,39 @@ from pyAudioAnalysis import audioSegmentation as aS
 import matplotlib.pyplot as pp
 from pydub.playback import play
 from pydub import AudioSegment
+import os
 import librosa
 class Audio:
-    def __init__(self, path):
+    def __init__(self, path,signal=None):
         self.path = path
         self.singleFrame = []
         self.allFrames = []
+
         self.index = path
-        (self.fs, signal) = wavfile.read(path)
-        segments=aS.silenceRemoval(signal, self.fs, 0.020, 0.020, smoothWindow = 1.0, Weight = 0.4, plot = False)
-        self.voicedSignal=np.array([],dtype=np.int16)
-        for segment in segments:
-            voicedStart=int(segment[0]*self.fs)
-            voicedEnd=int(segment[1]*self.fs)
-            self.voicedSignal=np.append(self.voicedSignal,signal[voicedStart:voicedEnd])
-        self.signal=self.voicedSignal
+        if signal is None:
+            path_list = path.split(os.sep)
+            indexOfLanguage=1
+            indexOfName=3
+            self.language=path_list[indexOfLanguage]
+            self.name=path_list[indexOfName]
+            (self.fs, signal) = wavfile.read(path)
+            segments=aS.silenceRemoval(signal, self.fs, 0.020, 0.020, smoothWindow = 1.0, Weight = 0.4, plot = False)
+            self.voicedSignal=np.array([],dtype=np.int16)
+            for segment in segments:
+                voicedStart=int(segment[0]*self.fs)
+                voicedEnd=int(segment[1]*self.fs)
+                self.voicedSignal=np.append(self.voicedSignal,signal[voicedStart:voicedEnd])
+            self.noFrames = len(self.voicedSignal)
+            self.signal=self.voicedSignal
+        else:
+            self.signal=signal
+            self.fs=16000
+            self.noFrames=len(self.signal)
+
         if self.fs != 16000:
             print "sampling Error.."
             return
-
         self.contextFeatureVector = []
-        self.noFrames = len(self.voicedSignal)
         self.featureVectorSize = -1
         self.contextFeatureVectorSize = -1
 
@@ -126,7 +138,7 @@ class Audio:
 
             averageFeature.append(averagingWindow)
             start = end
-            if start+2*averagingWindowSize>=noOfFrames:
+            if start+2*averagingWindowSize>noOfFrames:
                 end=noOfFrames
             else:
                 end = start + averagingWindowSize
@@ -135,6 +147,17 @@ class Audio:
 
     def getNoOfFrames(self):
         return self.noFrames
-"""G=Audio(AppConfig.getFilePathTraining("en",22))
+    def publish(self):
+        path=os.path.join("Samples",self.language,self.name)
+        np.save(path,self.signal)
+        #print "Saving..",path,self.signal[0:60]
+
+"""G=Audio(AppConfig.getFilePathTraining("en",20))
+print G.getNoOfFrames()/AppConfig.getWindowHop()
+#G.publish()
+
+sig=np.load(os.path.join("Samples",G.language,G.name+".npy"))
+print (G.signal==sig).all()
+
 x=np.array([[1,2,3],[2,3,4],[10,18,17],[100,2,3],[1,6,7]])
 print G.makeAverageWindows(x,2)"""

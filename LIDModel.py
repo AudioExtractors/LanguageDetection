@@ -12,7 +12,7 @@ class LIDModel:
         self.featureSet=AppConfig.featureSet
         self.RM=resolutionModel()
     def train(self,epoch):
-        self.SM=scoreModel(self.languages,self.featureSet,AppConfig.epoch)
+        self.SM=scoreModel(self.languages, self.featureSet, AppConfig.trainingDataSize)
         self.SM.train()
 
     def predict(self,audio):

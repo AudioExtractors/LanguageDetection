@@ -40,7 +40,6 @@ def read(file):
 
 def spectrum(file):
     x=wavfile.read(file)
-
     y=x[1]
     Fs=x[0]
     n = len(y) # length of the signal
@@ -141,12 +140,22 @@ def getTrainingSamples(language, rng=None, maxEpoch=AppConfig.getTrainingDataSiz
         for i in range(rng[0],min(rng[1],rng[0]+max)):
             sample=Audio.Audio(AppConfig.getFilePathTraining(language,i))
             samples.append(sample)
+
+    for sample in samples:
+        sample.publish()
+    return samples
+
+def getDumpTrainingSample(language):
+    samples=[]
+    for files in os.walk(os.path.join("Samples",language)):
+        for file in files[2]:
+            path=os.path.join(str(files[0]),file)
+            sig=np.load(path)
+            audio=Audio.Audio(path,sig)
+            samples.append(audio)
     return samples
 def getTestSamples(language, rng=None, maxEpoch=AppConfig.getTrainingDataSize(), max=AppConfig.maxTestSamples, random="True"):
     samples=[]
-    loadedFrames=0
-    error=10
-    maxFrames=(maxEpoch)*(AppConfig.getWindowHop()+error)
     if random=="True":
         if rng is None:
             randomNumbers=rd.sample(range(0,AppConfig.maxTestSamples),max)
@@ -155,25 +164,15 @@ def getTestSamples(language, rng=None, maxEpoch=AppConfig.getTrainingDataSize(),
         for i in randomNumbers:
             randomSample=Audio.Audio(AppConfig.getFilePathTest(language,i))
             samples.append(randomSample)
-            loadedFrames+=randomSample.getNoOfFrames()
-            if loadedFrames>maxFrames:
-                break
-
         return samples
     if rng is None:
         for i in range(max):
             sample=Audio.Audio(AppConfig.getFilePathTest(language,i))
             samples.append(sample)
-            loadedFrames+=sample.getNoOfFrames()
-            if loadedFrames>maxFrames:
-                break
     else:
         for i in range(rng[0],min(rng[1],rng[0]+max)):
             sample=Audio.Audio(AppConfig.getFilePathTest(language,i))
             samples.append(sample)
-            loadedFrames+=sample.getNoOfFrames()
-            if loadedFrames>maxFrames:
-                break
     return samples
 def getFeatureDumpSize():
     dumpList=[]
@@ -185,6 +184,10 @@ def getFeatureDumpSize():
 
 if __name__ == "__main__":
 
+
+    x=getDumpTrainingSample("en")
+    for i in x:
+        print i.path
     """
     x=getTestSamples("de",random="True",rng=(500,700),max=3,maxEpoch=100000)
     print len(x)

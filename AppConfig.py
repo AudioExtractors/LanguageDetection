@@ -1,19 +1,20 @@
 import os
-epoch = 800
-trainingDataSize = 1100  # must be greater than 2*contextWindow
+trainingDataSize = 1100*10  # must be greater than 2*contextWindow
 base_dir = "Data"
 test_base_dir = "Test"
+dump_train_dir="Samples"
 dump_base_dir="Dump"
+
 hiddenLayer = (10)  # approx (2/3)*len(featureSet)*contextWindow
 windowSize = 1000  # In number of frames
 windowHop = 500  # In number of frames
-languages = ["en", "de"]
-test_epoch = 10
-contextWindowSize = 1  # -x/2 to +x/2 number of frames
-maxTrainingSamples = 500
-maxTestSamples = 500
-trainingBatchSize=78*10000 #78 features * 100 samples
-averageFramesPerSample=1 #each clip treated as one sample by average out
+languages = ["en","de"]
+test_epoch = 300
+contextWindowSize = 5  # -x/2 to +x/2 number of frames
+maxTrainingSamples = 1200
+maxTestSamples = 1200
+trainingBatchSize=78*1000000 #78 features * 100 samples
+averageFramesPerSample=10 #each clip treated as one sample by average out
 featureNames = ['Zero Crossing Rate', 'Energy', 'Entropy of Energy', 'Spectral Centroid', 'Spectral Spread',
                 'Spectral Entropy', 'Spectral Flux', 'Spectral Rolloff', 'MFCC 1', 'MFCC 2', 'MFCC 3', 'MFCC 4',
                 'MFCC 5', 'MFCC 6', 'MFCC 7', 'MFCC 8', 'MFCC 9', 'MFCC 10', 'MFCC 11', 'MFCC 12', 'MFCC 13',
@@ -32,7 +33,6 @@ featureNumbers = [i for i in range(8, 21)]
 for i in range(34, 60):
     featureNumbers.append(i)
 
-
 def getFilePathTraining(language, number):
     range_start = number - number % 100
     folder = str(range_start) + "-" + (str(range_start+99))
@@ -46,6 +46,11 @@ def getFilePathTest(language, number):
     path = os.path.join(test_base_dir, language, folder, language + "_test" + str(number) + ".wav")
     return path
 
+def getFilePathTrainingDump(language, number):
+    range_start = number - number % 100
+    folder = str(range_start) + "-" + (str(range_start+99))
+    path = os.path.join(dump_train_dir, language,language+"_train"+str(number)+".wav"+".npy")
+    return path
 
 def getNumFeatures():
     return 78

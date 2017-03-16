@@ -25,6 +25,8 @@ class scoreModel:
         self.inputClassVector = []  # ClassVector
         for i,language in enumerate(languages):
             self.label[language] = i
+        self.mu=0
+        self.sigma=0
 
     def populateFeatureVector(self):
         """
@@ -43,29 +45,28 @@ class scoreModel:
             ct = 0
             for sample in samples:
                 featureVector = sample.getFullVector()
-                # for frameFeature in featureVector:
-                #     if inputSize >= self.epoch:
-                #         noOfFilesTrained.append((language, sample.getIndex()))
-                #         # languagesFeatures.append(X)
-                #         flag = 1
-                #         break
+                for frameFeature in featureVector:
+                    if inputSize >= self.epoch:
+                        noOfFilesTrained.append((language, sample.getIndex()))
+                        languagesFeatures.append(X)
+                        flag = 1
+                        break
                 X.append(featureVector)
-                # print type(X),type(x[0])
-                # print (len(X)*len(X[0])*64)/float(1024*1024*8), "..MB"
+                print (len(X)*len(X[0])*64)/float(1024*1024*8), "..MB"
                 Y.append(self.label.get(language))
-                # inputSize += 1
-                # if flag == 1:
-                #     break
+                inputSize += 1
+                if flag == 1:
+                    break
 
-        # print X
-        # print "Fetched Feature Vector.."
-        # X = self.normaliseFeatureVector(X)
-        # print "Normalised Feature Vector.."
-        # print "current memory usage : ", (process.memory_info().rss)/(1024*1024)
-        # self.assertFeatureVector(X,Y)
-        # #print X
+        print X
+        print "Fetched Feature Vector.."
+        X = self.normaliseFeatureVector(X)
+        print "Normalised Feature Vector.."
+        print "current memory usage : ", (process.memory_info().rss)/(1024*1024)
+        self.assertFeatureVector(X,Y)
+        print X
         self.classifier.train(np.array(X),Y)
-        # return noOfFilesTrained
+        return noOfFilesTrained
 
     def train(self):
 
@@ -85,8 +86,12 @@ class scoreModel:
                     combineDumpLanguageFeature=np.vstack((combineDumpLanguageFeature,X))
                     combineDumpLanguageLabel=np.concatenate((combineDumpLanguageLabel,Y))
             print combineDumpLanguageLabel
+            X,self.mu,self.sigma=self.normalise(combineDumpLanguageFeature)
             self.classifier.train(combineDumpLanguageFeature,combineDumpLanguageLabel)
 
+    def createAudioDumps(self):
+        for language in self.languages:
+            samples = AudioIO.getTrainingSamples(language,random="False")
 
     def dumpFeatureVector(self):
         """
@@ -103,15 +108,16 @@ class scoreModel:
             print "Fetching Data for ", language
             inputSize = 0
             flag = 0
-            samples = AudioIO.getTrainingSamples(language, random="False")
+
+            samples = AudioIO.getDumpTrainingSample(language)
             print "current memory usage : ", (process.memory_info().rss)/(1024*1024)
             ct = 0
             gt=0
             for sample in samples:
-                print ct
+                if ct%100==0:
+                    print ct
                 ct=ct+1
                 featureVector=sample.getAverageFeatureVector(std=True)
-                print featureVector.shape
                 if len(featureVector)>0:
                     featuresPerFrame=len(featureVector[0])
                 else:
@@ -120,7 +126,6 @@ class scoreModel:
                     if inputSize>=self.epoch:
                         underFetching=False
                         print "Created dump:-"+str(dumpLength)
-                        X=self.normaliseFeatureVector(X)
                         np.save("Dump\\dumpX_"+language+str(dumpLength),X)
                         np.save("Dump\\dumpY_"+language+str(dumpLength),Y)
                         print "Created All Dumps.."
@@ -129,7 +134,6 @@ class scoreModel:
                         break
                     if currentDumpSize + featuresPerFrame > AppConfig.trainingBatchSize:
                         currentDumpSize=0
-                        X=self.normaliseFeatureVector(X)
                         print "Created dump:-"+language+str(dumpLength)
                         np.save("Dump\\dumpX_"+language+str(dumpLength),X)
                         np.save("Dump\\dumpY_"+language+str(dumpLength),Y)
@@ -162,11 +166,11 @@ class scoreModel:
         print "Dimension Assert Pas", X[0].shape
 
     def predict(self, audio):
-        # featureVector = audio.getAverageFeatureVector(std=True)
-        # #normFeatureVector = self.normaliseFeatureVector(featureVector)
-        # return self.classifier.predict(featureVector)
+        featureVector = audio.getAverageFeatureVector(std=True)
+        normFeatureVector = self.normConv(featureVector,self.mu,self.sigma)
+        return self.classifier.predict(normFeatureVector)
         # # return self.classifier.predict(featureVector)
-        featureVector = audio.getFullVector()
+        #featureVector = audio.getFullVector()
         # print np.array(np.array(featureVector))
         return self.classifier.predict(np.array([featureVector]))
 
@@ -183,6 +187,15 @@ class scoreModel:
                 else:
                     delta[i][j] = delta[i][j]/diff[j]
         return delta
+    def normalise(self,X):
+        mu = np.mean(X,axis=0)
+        sigma = np.std(X,axis=0,ddof=1)
+        X_norm = (X-mu)/sigma
+        return X_norm, mu, sigma
+
+    #Converts test data to a format on which NN was trained
+    def normConv(self,X,mu,sigma):
+        return (X-mu)/sigma
 
     def plotFeature(self, language, type, fig, featNo, style, number):
         X = []
@@ -257,10 +270,12 @@ class scoreModel:
 
 a = datetime.datetime.now()
 X = scoreModel(AppConfig.languages, ["asd", "sdf", "asd"], AppConfig.getTrainingDataSize())
-X.populateFeatureVector()
-#X.dumpFeatureVector()
+#X.populateFeatureVector()
+#X.createAudioDumps()
+files=X.dumpFeatureVector()
+#print "Files",files
 #print AppConfig.getNumFeatures()*AppConfig.getContextWindowSize()
-#X.train()
+X.train()
 b=datetime.datetime.now()
 c=b-a
 print c.seconds
