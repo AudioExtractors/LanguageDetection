@@ -42,30 +42,30 @@ class scoreModel:
             print "yes"
             ct = 0
             for sample in samples:
-                featureVector = sample.getContextFeatureVector()
-                for frameFeature in featureVector:
-                    if inputSize >= self.epoch:
-                        noOfFilesTrained.append((language, sample.getIndex()))
-                        # languagesFeatures.append(X)
-                        flag = 1
-                        break
-                    X.append(frameFeature)
-                    # print type(X),type(x[0])
-                    # print (len(X)*len(X[0])*64)/float(1024*1024*8), "..MB"
-                    Y.append(self.label.get(language))
-                    inputSize += 1
-                if flag == 1:
-                    break
+                featureVector = sample.getFullVector()
+                # for frameFeature in featureVector:
+                #     if inputSize >= self.epoch:
+                #         noOfFilesTrained.append((language, sample.getIndex()))
+                #         # languagesFeatures.append(X)
+                #         flag = 1
+                #         break
+                X.append(featureVector)
+                # print type(X),type(x[0])
+                # print (len(X)*len(X[0])*64)/float(1024*1024*8), "..MB"
+                Y.append(self.label.get(language))
+                # inputSize += 1
+                # if flag == 1:
+                #     break
 
         # print X
-        print "Fetched Feature Vector.."
-        X = self.normaliseFeatureVector(X)
-        print "Normalised Feature Vector.."
-        print "current memory usage : ", (process.memory_info().rss)/(1024*1024)
-        self.assertFeatureVector(X,Y)
-        #print X
-        """self.classifier.train(X,Y)"""
-        return noOfFilesTrained
+        # print "Fetched Feature Vector.."
+        # X = self.normaliseFeatureVector(X)
+        # print "Normalised Feature Vector.."
+        # print "current memory usage : ", (process.memory_info().rss)/(1024*1024)
+        # self.assertFeatureVector(X,Y)
+        # #print X
+        self.classifier.train(np.array(X),Y)
+        # return noOfFilesTrained
 
     def train(self):
 
@@ -162,10 +162,14 @@ class scoreModel:
         print "Dimension Assert Pas", X[0].shape
 
     def predict(self, audio):
-        featureVector = audio.getAverageFeatureVector(std=True)
-        #normFeatureVector = self.normaliseFeatureVector(featureVector)
-        return self.classifier.predict(featureVector)
+        # featureVector = audio.getAverageFeatureVector(std=True)
+        # #normFeatureVector = self.normaliseFeatureVector(featureVector)
         # return self.classifier.predict(featureVector)
+        # # return self.classifier.predict(featureVector)
+        featureVector = audio.getFullVector()
+        # print np.array(np.array(featureVector))
+        return self.classifier.predict(np.array([featureVector]))
+
 
     def normaliseFeatureVector(self,X):
         Xmin=np.min(X,axis=0)
@@ -253,10 +257,10 @@ class scoreModel:
 
 a = datetime.datetime.now()
 X = scoreModel(AppConfig.languages, ["asd", "sdf", "asd"], AppConfig.getTrainingDataSize())
-#X.populateFeatureVector()
+X.populateFeatureVector()
 #X.dumpFeatureVector()
 #print AppConfig.getNumFeatures()*AppConfig.getContextWindowSize()
-X.train()
+#X.train()
 b=datetime.datetime.now()
 c=b-a
 print c.seconds

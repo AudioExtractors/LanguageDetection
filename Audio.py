@@ -27,7 +27,7 @@ class Audio:
             return
 
         self.contextFeatureVector = []
-        self.noFrames = len(self.signal)
+        self.noFrames = len(self.voicedSignal)
         self.featureVectorSize = -1
         self.contextFeatureVectorSize = -1
 
@@ -66,6 +66,17 @@ class Audio:
             self.allFrames.append(self.singleFrame)
         self.featureVectorSize = len(self.allFrames)
         return numpy.array(self.allFrames)
+
+    def getFullVector(self):
+        stFeatures = self.getFeatureVector()
+        FullVector = []
+        for i in range(len(stFeatures[0])):
+            forAvg = []
+            for j in range(len(stFeatures)):
+                forAvg.append(stFeatures[j][i])
+            FullVector.append(np.mean(forAvg))
+            FullVector.append(np.std(forAvg))
+        return FullVector
 
     def getContextFeatureVector(self):
         featureVector = self.getFeatureVector()

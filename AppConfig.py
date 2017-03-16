@@ -1,16 +1,17 @@
 import os
+epoch = 800
 trainingDataSize = 1100  # must be greater than 2*contextWindow
 base_dir = "Data"
 test_base_dir = "Test"
 dump_base_dir="Dump"
-hiddenLayer = (20)  # approx (2/3)*len(featureSet)*contextWindow
-windowSize = 700  # In number of frames
-windowHop = 350  # In number of frames
+hiddenLayer = (10)  # approx (2/3)*len(featureSet)*contextWindow
+windowSize = 1000  # In number of frames
+windowHop = 500  # In number of frames
 languages = ["en", "de"]
-test_epoch = 200
+test_epoch = 10
 contextWindowSize = 1  # -x/2 to +x/2 number of frames
-maxTrainingSamples = 1200
-maxTestSamples = 300
+maxTrainingSamples = 500
+maxTestSamples = 500
 trainingBatchSize=78*10000 #78 features * 100 samples
 averageFramesPerSample=1 #each clip treated as one sample by average out
 featureNames = ['Zero Crossing Rate', 'Energy', 'Entropy of Energy', 'Spectral Centroid', 'Spectral Spread',
