@@ -90,8 +90,9 @@ class scoreModel:
             self.classifier.train(combineDumpLanguageFeature,combineDumpLanguageLabel)
 
     def createAudioDumps(self):
+
         for language in self.languages:
-            samples = AudioIO.getTrainingSamples(language,random="False")
+            AudioIO.dumpAudioFiles(language)
 
     def dumpFeatureVector(self):
         """
@@ -115,6 +116,7 @@ class scoreModel:
             gt=0
             for sample in samples:
                 if ct%100==0:
+                    print inputSize
                     print ct
                 ct=ct+1
                 featureVector=sample.getAverageFeatureVector(std=True)
@@ -169,10 +171,6 @@ class scoreModel:
         featureVector = audio.getAverageFeatureVector(std=True)
         normFeatureVector = self.normConv(featureVector,self.mu,self.sigma)
         return self.classifier.predict(normFeatureVector)
-        # # return self.classifier.predict(featureVector)
-        #featureVector = audio.getFullVector()
-        # print np.array(np.array(featureVector))
-        return self.classifier.predict(np.array([featureVector]))
 
 
     def normaliseFeatureVector(self,X):
@@ -272,7 +270,7 @@ a = datetime.datetime.now()
 X = scoreModel(AppConfig.languages, ["asd", "sdf", "asd"], AppConfig.getTrainingDataSize())
 #X.populateFeatureVector()
 #X.createAudioDumps()
-files=X.dumpFeatureVector()
+#files=X.dumpFeatureVector()
 #print "Files",files
 #print AppConfig.getNumFeatures()*AppConfig.getContextWindowSize()
 X.train()

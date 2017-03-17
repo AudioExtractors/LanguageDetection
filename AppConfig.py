@@ -1,16 +1,16 @@
 import os
-trainingDataSize = 1100*10  # must be greater than 2*contextWindow
+trainingDataSize = 1100*7  # must be greater than 2*contextWindow
 base_dir = "Data"
 test_base_dir = "Test"
 dump_train_dir="Samples"
 dump_base_dir="Dump"
 
-hiddenLayer = (10)  # approx (2/3)*len(featureSet)*contextWindow
+hiddenLayer = (55)  # approx (2/3)*len(featureSet)*contextWindow
 windowSize = 1000  # In number of frames
 windowHop = 500  # In number of frames
 languages = ["en","de"]
 test_epoch = 300
-contextWindowSize = 5  # -x/2 to +x/2 number of frames
+contextWindowSize = 3  # -x/2 to +x/2 number of frames
 maxTrainingSamples = 1200
 maxTestSamples = 1200
 trainingBatchSize=78*1000000 #78 features * 100 samples

@@ -121,6 +121,7 @@ def getFeature():
     (fs,signal)=wavfile.read(getFilePathTraining("de",80))
     ft = audioFeatureExtraction.stFeatureExtraction(signal,fs,1000,500)
     print 1/ft[0]
+
 def getTrainingSamples(language, rng=None, maxEpoch=AppConfig.getTrainingDataSize(), max=AppConfig.maxTrainingSamples, random="True"):
     samples=[]
     if random=="True":
@@ -140,10 +141,12 @@ def getTrainingSamples(language, rng=None, maxEpoch=AppConfig.getTrainingDataSiz
         for i in range(rng[0],min(rng[1],rng[0]+max)):
             sample=Audio.Audio(AppConfig.getFilePathTraining(language,i))
             samples.append(sample)
+    return samples
 
+def dumpAudioFiles(language):
+    samples=getTrainingSamples(language)
     for sample in samples:
         sample.publish()
-    return samples
 
 def getDumpTrainingSample(language):
     samples=[]
