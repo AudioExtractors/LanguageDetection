@@ -23,7 +23,8 @@ class Classify:
         if isinstance(hidden_layers, (collections.Sequence, numpy.ndarray)):
             self.model.add(
                 Dense(hidden_layers[0], activity_regularizer=activity_l2(),
-                      input_dim=AppConfig.getNumFeatures() * AppConfig.getContextWindowSize(), activation='sigmoid'))
+                      input_dim=AppConfig.getNumFeatures() * AppConfig.getNumberOfAverageStats() *
+                      AppConfig.getContextWindowSize(), activation='sigmoid'))
             # self.model.add(Dropout(0.3))
             # self.model.add(BatchNormalization())
             for num in range(1, len(hidden_layers)):
@@ -36,7 +37,8 @@ class Classify:
             #           input_dim=13, activation='sigmoid'))
             self.model.add(
                 Dense(hidden_layers, activity_regularizer=activity_l2(),
-                      input_dim=AppConfig.getNumFeatures() * AppConfig.getContextWindowSize(), activation='sigmoid'))
+                      input_dim=AppConfig.getNumFeatures() * AppConfig.getNumberOfAverageStats() *
+                      AppConfig.getContextWindowSize(), activation='sigmoid'))
             # self.model.add(Dropout(0.3))
             # self.model.add(BatchNormalization())
         # self.model.add(Dense(2, activation='sigmoid'))
@@ -73,7 +75,7 @@ class Classify:
             output.append(y)
         output = numpy.array(output)
 
-        self.model.fit(X, output)
+        self.model.fit(X, output, batch_size=AppConfig.getBatchSize(), nb_epoch=AppConfig.getNumberEpochs())
 
     def predict(self, feature):
         """
