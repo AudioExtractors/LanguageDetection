@@ -4,13 +4,12 @@ import numpy as np
 from scipy.io import wavfile
 from pyAudioAnalysis import audioFeatureExtraction
 from pyAudioAnalysis import audioSegmentation as aS
-import matplotlib.pyplot as pp
-from pydub.playback import play
-from pydub import AudioSegment
 import os
 import librosa
+
+
 class Audio:
-    def __init__(self, path,signal=None):
+    def __init__(self, path, signal=None):
         self.path = path
         self.singleFrame = []
         self.allFrames = []
@@ -18,23 +17,23 @@ class Audio:
         self.index = path
         if signal is None:
             path_list = path.split(os.sep)
-            indexOfLanguage=1
-            indexOfName=3
+            indexOfLanguage = 1
+            indexOfName = 3
             self.language=path_list[indexOfLanguage]
             self.name=path_list[indexOfName]
             (self.fs, signal) = wavfile.read(path)
-            segments=aS.silenceRemoval(signal, self.fs, 0.020, 0.020, smoothWindow = 1.0, Weight = 0.4, plot = False)
-            self.voicedSignal=np.array([],dtype=np.int16)
+            segments = aS.silenceRemoval(signal, self.fs, 0.020, 0.020, smoothWindow=1.0, Weight=0.4, plot=False)
+            self.voicedSignal = np.array([], dtype=np.int16)
             for segment in segments:
-                voicedStart=int(segment[0]*self.fs)
-                voicedEnd=int(segment[1]*self.fs)
-                self.voicedSignal=np.append(self.voicedSignal,signal[voicedStart:voicedEnd])
+                voicedStart = int(segment[0]*self.fs)
+                voicedEnd = int(segment[1]*self.fs)
+                self.voicedSignal = np.append(self.voicedSignal, signal[voicedStart:voicedEnd])
             self.noFrames = len(self.voicedSignal)
-            self.signal=self.voicedSignal
+            self.signal = self.voicedSignal
         else:
-            self.signal=signal
-            self.fs=16000
-            self.noFrames=len(self.signal)
+            self.signal = signal
+            self.fs = 16000
+            self.noFrames = len(self.signal)
 
         if self.fs != 16000:
             print "sampling Error.."
@@ -94,7 +93,7 @@ class Audio:
         featureVector = self.getFeatureVector()
         contextFeatureVector = self.makeContextWindows(featureVector)
         self.contextFeatureVectorSize = contextFeatureVector.shape
-        #self.contextFeatureVector = contextFeatureVector   commented to save memory
+        # self.contextFeatureVector = contextFeatureVector   commented to save memory
         return contextFeatureVector
 
     def makeContextWindows(self, languageFeature):
@@ -111,37 +110,37 @@ class Audio:
         contextFeature = np.array(contextFeature)
         return contextFeature
 
-    def getAverageFeatureVector(self,std=False):#std true means standard deviation to be included as well
-        featureVector=self.getFeatureVector()
-        averageFeatureVector=self.makeAverageWindows(featureVector,AppConfig.averageFramesPerSample)
-        averageFeatureVector=self.makeContextWindows(averageFeatureVector)
-        if std==True:
-            stdFeatureVector=self.makeAverageWindows(featureVector,AppConfig.averageFramesPerSample,std=True)
-            stdFeatureVector=self.makeContextWindows(stdFeatureVector)
+    def getAverageFeatureVector(self, std=False):  # std true means standard deviation to be included as well
+        featureVector = self.getFeatureVector()
+        averageFeatureVector = self.makeAverageWindows(featureVector, AppConfig.averageFramesPerSample)
+        averageFeatureVector = self.makeContextWindows(averageFeatureVector)
+        if std == True:
+            stdFeatureVector = self.makeAverageWindows(featureVector, AppConfig.averageFramesPerSample, std=True)
+            stdFeatureVector = self.makeContextWindows(stdFeatureVector)
             if averageFeatureVector.shape != stdFeatureVector.shape:
                 print "Average Features cannot be concatenated because of shape error"
-            averageFeatureVector=np.concatenate((averageFeatureVector,stdFeatureVector),axis=1)
+            averageFeatureVector = np.concatenate((averageFeatureVector, stdFeatureVector), axis=1)
         return averageFeatureVector
 
-    def makeAverageWindows(self,languageFeature,averageFramesPerSample,std=False):
-        averageFeature=[]
-        noOfFrames=len(languageFeature)
-        averagingWindowSize=max(1,noOfFrames/averageFramesPerSample)
-        start=0
-        end=averagingWindowSize
+    def makeAverageWindows(self, languageFeature, averageFramesPerSample, std=False):
+        averageFeature = []
+        noOfFrames = len(languageFeature)
+        averagingWindowSize = max(1, noOfFrames/averageFramesPerSample)
+        start = 0
+        end = averagingWindowSize
         for i in range(noOfFrames):
             if start >= noOfFrames:
                 break
             averagingWindow = languageFeature[start:end]
-            if std==True:
+            if std == True:
                 averagingWindow = averagingWindow.mean(axis=0)
             else:
                 averagingWindow = averagingWindow.std(axis=0)
 
             averageFeature.append(averagingWindow)
             start = end
-            if start+2*averagingWindowSize>noOfFrames:
-                end=noOfFrames
+            if start+2*averagingWindowSize > noOfFrames:
+                end = noOfFrames
             else:
                 end = start + averagingWindowSize
         averageFeature = np.array(averageFeature)
@@ -149,10 +148,11 @@ class Audio:
 
     def getNoOfFrames(self):
         return self.noFrames
+
     def publish(self):
-        path=os.path.join("Samples",self.language,self.name)
-        np.save(path,self.signal)
-        #print "Saving..",path,self.signal[0:60]
+        path = os.path.join("Samples", self.language, self.name)
+        np.save(path, self.signal)
+        # print "Saving..",path,self.signal[0:60]
 
 """G=Audio(AppConfig.getFilePathTraining("en",20))
 print G.getNoOfFrames()/AppConfig.getWindowHop()

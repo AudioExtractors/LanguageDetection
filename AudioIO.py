@@ -1,13 +1,8 @@
-import os
-import tarfile
 # import python_speech_features as psf
 from pydub import AudioSegment
-from scipy import signal
 import numpy as np
-from pydub.playback import play
 import scipy.io.wavfile as wavfile
-from pydub.playback import play
-from matplotlib.pyplot import plot,subplot,xlabel,ylabel,show,figure
+from matplotlib.pyplot import plot, subplot, xlabel, ylabel, show, figure
 import matplotlib.pyplot as plt
 from scipy import fft,arange
 from AppConfig import *
@@ -15,77 +10,82 @@ from pyAudioAnalysis import audioFeatureExtraction
 import Audio
 import AppConfig
 import random as rd
-#TUTS
-#os.mkdir('')
-#os.mkdirs('')
-#os.listdir()
-#os.getcwd()
-#os.chdir()
-#song = AudioSegment.from_mp3('vocal.mp3')
-#data = numpy.fromstring(song._data, numpy.int16)
+# TUTS
+# os.mkdir('')
+# os.mkdirs('')
+# os.listdir()
+# os.getcwd()
+# os.chdir()
+# song = AudioSegment.from_mp3('vocal.mp3')
+# data = numpy.fromstring(song._data, numpy.int16)
+
 
 def read(file):
-    x=wavfile.read(file)
-    sound=x[1]
-    fs=x[0]
-    samples=len(sound)
-    time=5
-    #time=float(samples)/fs
-    #print time
-    timestamp=[time*float(i)/samples for i in range(0,samples)]
+    x = wavfile.read(file)
+    sound = x[1]
+    fs = x[0]
+    samples = len(sound)
+    time = 5
+    # time = float(samples)/fs
+    # print time
+    timestamp = [time*float(i)/samples for i in range(0, samples)]
     figure(1)
     xlabel('Time(sec)')
     ylabel('Magnitude')
-    plot(timestamp,sound[0:samples])
+    plot(timestamp, sound[0:samples])
+
 
 def spectrum(file):
-    x=wavfile.read(file)
-    y=x[1]
-    Fs=x[0]
-    n = len(y) # length of the signal
+    x = wavfile.read(file)
+    y = x[1]
+    Fs = x[0]
+    n = len(y)  # length of the signal
     k = arange(n)
     T = n/Fs
-    frq = k/T # two sides frequency range
-    frq = frq[range(n/2)] # one side frequency range
-    Y = fft(y)/n # fft computing and normalization
+    frq = k/T  # two sides frequency range
+    frq = frq[range(n/2)]  # one side frequency range
+    Y = fft(y)/n  # fft computing and normalization
     Y = Y[range(n/2)]
     figure(2)
-    plot(frq,abs(Y),'r') # plotting the spectrum
+    plot(frq, abs(Y), 'r')  # plotting the spectrum
     xlabel('Freq (Hz)')
     ylabel('|Y(freq)|')
     show()
+
+
 def preprocess():
-    files=[]
+    files = []
     for i in os.walk('dataset'):
         for f in i[2]:
             files.append(str(i[0])+"\\"+f)
-    L=len(files)
-    ct=0
-    for num,f in enumerate(files):
+    L = len(files)
+    ct = 0
+    for num, f in enumerate(files):
         if(".flac" not in f):
             continue
-        print str(num),L
-        if ct%100==0:
-            D=str(ct)+"-"+str(ct+99)
+        print str(num), L
+        if ct % 100 == 0:
+            D = str(ct)+"-"+str(ct+99)
             os.mkdir("DNEW/"+D)
         sound = AudioSegment.from_file(f, format="flac")
         sound.export("DNEW/"+D+"/eng_train"+str(ct)+".wav",format = "wav")
-        ct=ct+1
-def filter():
+        ct = ct+1
 
+
+def filter():
     for i in os.walk("DNEW"):
-        for num,f in enumerate(i[2]):
-            x=wavfile.read(str(i[0])+"\\"+f)
-            y=x[1]
-            Fs=x[0]
-            n = len(y) # length of the signal
+        for num, f in enumerate(i[2]):
+            x = wavfile.read(str(i[0])+"\\"+f)
+            y = x[1]
+            Fs = x[0]
+            n = len(y)  # length of the signal
             k = arange(n)
             T = n/Fs
-            frq = k/T # two sides frequency range
-            frq = frq[range(n/2)] # one side frequency range
-            Y = fft(y)/n # fft computing and normalization
+            frq = k/T  # two sides frequency range
+            frq = frq[range(n/2)]  # one side frequency range
+            Y = fft(y)/n  # fft computing and normalization
             Y = Y[range(n/2)]
-            fr=np.dot(abs(Y),frq)/sum(abs(Y))
+            fr = np.dot(abs(Y), frq)/sum(abs(Y))
             print fr
             """mx=-1
             for k,j in enumerate(Y):
@@ -96,10 +96,12 @@ def filter():
                 print mf,f
             else:
                 print f"""
-def MFCCExtract(file,num,color):
-    x=wavfile.read(file)
-    feat=psf.mfcc(x[1],x[0])
-    X=[]
+
+
+def MFCCExtract(file, num, color):
+    x = wavfile.read(file)
+    feat = psf.mfcc(x[1], x[0])
+    X = []
     for f in feat:
         X.append(f[0])
     Y=[]
@@ -108,77 +110,88 @@ def MFCCExtract(file,num,color):
     figure(num)
     xlabel("MFCC Coeff 1")
     ylabel("MFCC Coeff 2")
-    plot(X,Y,color)
-    plt.axis([0,50,-70,40])
+    plot(X, Y, color)
+    plt.axis([0, 50, -70, 40])
     plt.grid(True)
-def spectrogramPlot(file,fig):
-    (fs,x)=wavfile.read(file)
+
+
+def spectrogramPlot(file, fig):
+    (fs, x) = wavfile.read(file)
     plt.figure(fig)
     Pxx, freqs, bins, im = plt.specgram(x, NFFT=1024, Fs=fs, noverlap=900)
-    plt.axis([1,4,0,1000])
-def getFeature():
+    plt.axis([1, 4, 0, 1000])
 
-    (fs,signal)=wavfile.read(getFilePathTraining("de",80))
-    ft = audioFeatureExtraction.stFeatureExtraction(signal,fs,1000,500)
+
+def getFeature():
+    (fs, signal) = wavfile.read(getFilePathTraining("de", 80))
+    ft = audioFeatureExtraction.stFeatureExtraction(signal, fs, 1000, 500)
     print 1/ft[0]
 
+
 def getTrainingSamples(language, rng=None, maxEpoch=AppConfig.getTrainingDataSize(), max=AppConfig.maxTrainingSamples, random="True"):
-    samples=[]
-    if random=="True":
+    samples = []
+    if random == "True":
         if rng is None:
-            randomNumbers=rd.sample(range(0,AppConfig.maxTrainingSamples),max)
+            randomNumbers = rd.sample(range(0,AppConfig.maxTrainingSamples), max)
         else:
-            randomNumbers=rd.sample(range(rng[0],min(AppConfig.maxTrainingSamples,rng[1])),min(max,rng[1]-rng[0]-1))
+            randomNumbers = rd.sample(range(rng[0], min(AppConfig.maxTrainingSamples, rng[1])), min(max,
+                                                                                                    rng[1]-rng[0]-1))
         for i in randomNumbers:
-            randomSample=Audio.Audio(AppConfig.getFilePathTraining(language,i))
+            randomSample = Audio.Audio(AppConfig.getFilePathTraining(language, i))
             samples.append(randomSample)
         return samples
     if rng is None:
         for i in range(max):
-            sample=Audio.Audio(AppConfig.getFilePathTraining(language,i))
+            sample = Audio.Audio(AppConfig.getFilePathTraining(language, i))
             samples.append(sample)
     else:
-        for i in range(rng[0],min(rng[1],rng[0]+max)):
-            sample=Audio.Audio(AppConfig.getFilePathTraining(language,i))
+        for i in range(rng[0], min(rng[1], rng[0]+max)):
+            sample = Audio.Audio(AppConfig.getFilePathTraining(language, i))
             samples.append(sample)
     return samples
 
+
 def dumpAudioFiles(language):
-    samples=getTrainingSamples(language)
+    samples = getTrainingSamples(language)
     for sample in samples:
         sample.publish()
 
+
 def getDumpTrainingSample(language):
-    samples=[]
-    for files in os.walk(os.path.join("Samples",language)):
+    samples = []
+    for files in os.walk(os.path.join("Samples", language)):
         for file in files[2]:
-            path=os.path.join(str(files[0]),file)
-            sig=np.load(path)
-            audio=Audio.Audio(path,sig)
+            path = os.path.join(str(files[0]), file)
+            sig = np.load(path)
+            audio = Audio.Audio(path, sig)
             samples.append(audio)
     return samples
+
+
 def getTestSamples(language, rng=None, maxEpoch=AppConfig.getTrainingDataSize(), max=AppConfig.maxTestSamples, random="True"):
     samples=[]
-    if random=="True":
+    if random == "True":
         if rng is None:
-            randomNumbers=rd.sample(range(0,AppConfig.maxTestSamples),max)
+            randomNumbers = rd.sample(range(0, AppConfig.maxTestSamples), max)
         else:
-            randomNumbers=rd.sample(range(rng[0],min(AppConfig.maxTestSamples,rng[1])),min(max,rng[1]-rng[0]-1))
+            randomNumbers = rd.sample(range(rng[0], min(AppConfig.maxTestSamples, rng[1])), min(max, rng[1]-rng[0]-1))
         for i in randomNumbers:
-            randomSample=Audio.Audio(AppConfig.getFilePathTest(language,i))
+            randomSample = Audio.Audio(AppConfig.getFilePathTest(language, i))
             samples.append(randomSample)
         return samples
     if rng is None:
         for i in range(max):
-            sample=Audio.Audio(AppConfig.getFilePathTest(language,i))
+            sample = Audio.Audio(AppConfig.getFilePathTest(language, i))
             samples.append(sample)
     else:
-        for i in range(rng[0],min(rng[1],rng[0]+max)):
-            sample=Audio.Audio(AppConfig.getFilePathTest(language,i))
+        for i in range(rng[0], min(rng[1], rng[0]+max)):
+            sample = Audio.Audio(AppConfig.getFilePathTest(language, i))
             samples.append(sample)
     return samples
+
+
 def getFeatureDumpSize():
-    dumpList=[]
+    dumpList = []
     for i in os.walk("Dump"):
         print i[0],i[2]
         for dumps in i[2]:
@@ -186,9 +199,7 @@ def getFeatureDumpSize():
     return len(dumpList)/(2*AppConfig.getNumLanguages())
 
 if __name__ == "__main__":
-
-
-    x=getDumpTrainingSample("en")
+    x = getDumpTrainingSample("en")
     for i in x:
         print i.path
     """
@@ -212,5 +223,5 @@ if __name__ == "__main__":
 
     file4="DNEW//100-199//eng_train145.wav"
     MFCCExtract(file4,1,'gd')"""
-    #spectrogramPlot("Trash//Dutch//400-499//dutch_train403.wav",1)
-    #spectrogramPlot("Trash//DutchNoise//29.wav",2)
+    # spectrogramPlot("Trash//Dutch//400-499//dutch_train403.wav",1)
+    # spectrogramPlot("Trash//DutchNoise//29.wav",2)
