@@ -1,13 +1,10 @@
 from keras.models import Sequential
-from keras.layers import Dense
-from keras.regularizers import activity_l2
-# from keras.utils import np_utils
+from keras.layers import Dense, Dropout
+from keras.regularizers import activity_l2, activity_l1l2
 # from keras.layers.normalization import BatchNormalization  # Batch Normalization can be added
 import collections
 import AppConfig
 import numpy
-import AudioIO
-from keras.utils import np_utils
 
 
 class Classify:
@@ -22,7 +19,7 @@ class Classify:
         self.model = Sequential()
         if isinstance(hidden_layers, (collections.Sequence, numpy.ndarray)):
             self.model.add(
-                Dense(hidden_layers[0], activity_regularizer=activity_l2(),
+                Dense(hidden_layers[0],
                       input_dim=AppConfig.getNumFeatures() * AppConfig.getNumberOfAverageStats() *
                       AppConfig.getContextWindowSize(), activation='sigmoid'))
             # self.model.add(Dropout(0.3))
@@ -36,24 +33,24 @@ class Classify:
             #     Dense(hidden_layers, activity_regularizer=activity_l2(),
             #           input_dim=13, activation='sigmoid'))
             self.model.add(
-                Dense(hidden_layers, activity_regularizer=activity_l2(),
+                Dense(hidden_layers,
                       input_dim=AppConfig.getNumFeatures() * AppConfig.getNumberOfAverageStats() *
                       AppConfig.getContextWindowSize(), activation='sigmoid'))
-            # self.model.add(Dropout(0.3))
+            # self.model.add(Dropout(0.1))
             # self.model.add(BatchNormalization())
         # self.model.add(Dense(2, activation='sigmoid'))
-        self.model.add(Dense(AppConfig.getNumLanguages(), activation='sigmoid'))
+        self.model.add(Dense(AppConfig.getNumLanguages(), activation='softmax'))
         # self.model.add(BatchNormalization())
-        self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])  # adam gave
+        self.model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'])  # adam gave
         # better results, but adadelta used everywhere
 
-    def generator(self):
-        sz = AudioIO.getFeatureDumpSize()
-        for i in range(sz-1):
-            X = numpy.load("Dump//dumpX_"+str(i)+".npy")
-            Y = numpy.load("Dump//dumpY_"+str(i)+".npy")
-            Ydash = []
-            yield X, np_utils.to_categorical(Y, 2)
+    # def generator(self):
+    #     sz = AudioIO.getFeatureDumpSize()
+    #     for i in range(sz-1):
+    #         X = numpy.load("Dump//dumpX_"+str(i)+".npy")
+    #         Y = numpy.load("Dump//dumpY_"+str(i)+".npy")
+    #         Ydash = []
+    #         yield X, np_utils.to_categorical(Y, 2)
 
     def train(self, X, Y):
         """

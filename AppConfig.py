@@ -1,22 +1,22 @@
 import os
-trainingDataSize = 1100*7  # must be greater than 2*contextWindow
+trainingDataSize = 1200*10  # must be greater than 2*contextWindow
 base_dir = "Data"
 test_base_dir = "Test"
 dump_train_dir = "Samples"
 dump_base_dir = "Dump"
-hiddenLayer = (55)  # approx (2/3)*len(featureSet)*contextWindow
+hiddenLayer = (12, 8)  # approx (2/3)*len(featureSet)*contextWindow
 windowSize = 1000  # In number of frames
-windowHop = 500  # In number of frames
-languages = ["en", "de"]
+windowHop = 750  # In number of frames
+languages = ["en", "de", "it"]
 test_epoch = 300
 contextWindowSize = 1  # -x/2 to +x/2 number of frames
-maxTrainingSamples = 1200
-maxTestSamples = 1200
+maxTrainingSamples = 1210
+maxTestSamples = 1210
 trainingBatchSize = 78*1000000  # 78 features * 100 samples
 averageFramesPerSample = 10  # each clip treated as one sample by average out
-batch_size = 32
-nb_epoch = 10
-numberOfAverageStats = 3
+batch_size = 80
+nb_epoch = 30
+numberOfAverageStats = 2
 featureNames = ['Zero Crossing Rate', 'Energy', 'Entropy of Energy', 'Spectral Centroid', 'Spectral Spread',
                 'Spectral Entropy', 'Spectral Flux', 'Spectral Rolloff', 'MFCC 1', 'MFCC 2', 'MFCC 3', 'MFCC 4',
                 'MFCC 5', 'MFCC 6', 'MFCC 7', 'MFCC 8', 'MFCC 9', 'MFCC 10', 'MFCC 11', 'MFCC 12', 'MFCC 13',
@@ -107,6 +107,7 @@ def getBatchSize():
 
 def getNumberEpochs():
     return nb_epoch
+
 
 def getNumberOfAverageStats():
     return numberOfAverageStats

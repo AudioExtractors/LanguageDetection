@@ -13,14 +13,13 @@ class Audio:
         self.path = path
         self.singleFrame = []
         self.allFrames = []
-
         self.index = path
         if signal is None:
             path_list = path.split(os.sep)
             indexOfLanguage = 1
             indexOfName = 3
-            self.language=path_list[indexOfLanguage]
-            self.name=path_list[indexOfName]
+            self.language = path_list[indexOfLanguage]
+            self.name = path_list[indexOfName]
             (self.fs, signal) = wavfile.read(path)
             segments = aS.silenceRemoval(signal, self.fs, 0.020, 0.020, smoothWindow=1.0, Weight=0.4, plot=False)
             self.voicedSignal = np.array([], dtype=np.int16)
@@ -78,17 +77,6 @@ class Audio:
         self.featureVectorSize = len(self.allFrames)
         return numpy.array(self.allFrames)
 
-    def getFullVector(self):
-        stFeatures = self.getFeatureVector()
-        FullVector = []
-        for i in range(len(stFeatures[0])):
-            forAvg = []
-            for j in range(len(stFeatures)):
-                forAvg.append(stFeatures[j][i])
-            FullVector.append(np.mean(forAvg))
-            FullVector.append(np.std(forAvg))
-        return FullVector
-
     def getContextFeatureVector(self):
         featureVector = self.getFeatureVector()
         contextFeatureVector = self.makeContextWindows(featureVector)
@@ -102,7 +90,7 @@ class Audio:
         for i in range(noOfFrames):
             start = i
             end = i + AppConfig.getContextWindowSize()
-            if end >= noOfFrames:
+            if end > noOfFrames:
                 break
             context = languageFeature[start:end]
             context = np.reshape(context, context.size)
@@ -133,9 +121,9 @@ class Audio:
                 break
             averagingWindow = languageFeature[start:end]
             if std == True:
-                averagingWindow = averagingWindow.mean(axis=0)
-            else:
                 averagingWindow = averagingWindow.std(axis=0)
+            else:
+                averagingWindow = averagingWindow.mean(axis=0)
 
             averageFeature.append(averagingWindow)
             start = end
