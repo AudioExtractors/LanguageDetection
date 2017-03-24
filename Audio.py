@@ -100,13 +100,13 @@ class Audio:
 
     def getAverageFeatureVector(self, std=False):  # std true means standard deviation to be included as well
         featureVector = self.getFeatureVector()
+        featureVector = self.makeContextWindows(featureVector)
         averageFeatureVector = self.makeAverageWindows(featureVector, AppConfig.averageFramesPerSample)
-        averageFeatureVector = self.makeContextWindows(averageFeatureVector)
         if std == True:
             stdFeatureVector = self.makeAverageWindows(featureVector, AppConfig.averageFramesPerSample, std=True)
-            stdFeatureVector = self.makeContextWindows(stdFeatureVector)
             if averageFeatureVector.shape != stdFeatureVector.shape:
                 print "Average Features cannot be concatenated because of shape error"
+                print stdFeatureVector.shape,averageFeatureVector.shape
             averageFeatureVector = np.concatenate((averageFeatureVector, stdFeatureVector), axis=1)
         return averageFeatureVector
 
