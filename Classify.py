@@ -2,10 +2,10 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from keras.regularizers import activity_l2, activity_l1l2
 # from keras.layers.normalization import BatchNormalization  # Batch Normalization can be added
+from sklearn.preprocessing import LabelBinarizer
 import collections
 import AppConfig
 import numpy
-
 
 class Classify:
     def __init__(self):
@@ -65,13 +65,7 @@ class Classify:
         # shuffle is true by default (shuffle batches)
         """self.model.fit_generator(self.generator(),
         samples_per_epoch=50000, nb_epoch=10)"""
-        output = []
-        for outputs in Y:
-            y = numpy.zeros((AppConfig.getNumLanguages(),), dtype=numpy.int)
-            y[outputs] = 1
-            output.append(y)
-        output = numpy.array(output)
-
+        output = LabelBinarizer().fit(range(AppConfig.getNumLanguages())).transform(y)
         self.model.fit(X, output, batch_size=AppConfig.getBatchSize(), nb_epoch=AppConfig.getNumberEpochs())
 
     def predict(self, feature):
