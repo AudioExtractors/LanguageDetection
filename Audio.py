@@ -6,6 +6,7 @@ from pyAudioAnalysis import audioFeatureExtraction
 from pyAudioAnalysis import audioSegmentation as aS
 import os
 import librosa
+import formants
 
 
 class Audio:
@@ -70,10 +71,17 @@ class Audio:
         Deltas2 = numpy.transpose(Deltas2)
         featureVector = []
 
+        # start = 0
         for frames in range(0, len(featureVectorTemp)):
             Temp = numpy.append(featureVectorTemp[frames], Deltas[frames])
             Temp = numpy.append(Temp, Deltas2[frames])
+            # end = start + AppConfig.getWindowSize()
+            # if end >= len(self.signal):
+            #    end = len(self.signal) - 1
+            # Temp = numpy.append(Temp, formants.getFormants(self.fs, self.signal[start:end]))
+            # start += AppConfig.getWindowHop()
             featureVector.append(Temp)
+
         featureVector = numpy.array(featureVector)
         for frames in featureVector:
             self.singleFrame = []
@@ -87,7 +95,7 @@ class Audio:
         featureVector = self.getFeatureVector()
         contextFeatureVector = self.makeContextWindows(featureVector)
         self.contextFeatureVectorSize = contextFeatureVector.shape
-        # self.contextFeatureVector = contextFeatureVector   commented to save memory
+        # self.contextFeatureVector = contextFeatureVector   # commented to save memory
         return contextFeatureVector
 
     def makeContextWindows(self, languageFeature):

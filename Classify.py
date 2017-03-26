@@ -7,6 +7,7 @@ import collections
 import AppConfig
 import numpy
 
+
 class Classify:
     def __init__(self):
         """
@@ -21,11 +22,11 @@ class Classify:
             self.model.add(
                 Dense(hidden_layers[0],
                       input_dim=AppConfig.getNumFeatures() * AppConfig.getNumberOfAverageStats() *
-                      AppConfig.getContextWindowSize(), activation='sigmoid'))
-            # self.model.add(Dropout(0.3))
+                      AppConfig.getContextWindowSize(), activity_regularizer=activity_l2(), activation='sigmoid'))
+            self.model.add(Dropout(0.2))
             # self.model.add(BatchNormalization())
             for num in range(1, len(hidden_layers)):
-                self.model.add(Dense(hidden_layers[num], activation='sigmoid'))
+                self.model.add(Dense(hidden_layers[num], activity_regularizer=activity_l2(), activation='sigmoid'))
                 # self.model.add(Dropout(0.3))
                 # self.model.add(BatchNormalization())
         else:
@@ -35,11 +36,11 @@ class Classify:
             self.model.add(
                 Dense(hidden_layers,
                       input_dim=AppConfig.getNumFeatures() * AppConfig.getNumberOfAverageStats() *
-                      AppConfig.getContextWindowSize(), activation='sigmoid'))
-            # self.model.add(Dropout(0.1))
+                      AppConfig.getContextWindowSize(), activity_regularizer=activity_l2(), activation='sigmoid'))
+            self.model.add(Dropout(0.2))
             # self.model.add(BatchNormalization())
         # self.model.add(Dense(2, activation='sigmoid'))
-        self.model.add(Dense(AppConfig.getNumLanguages(), activation='softmax'))
+        self.model.add(Dense(AppConfig.getNumLanguages(), activity_regularizer=activity_l2(), activation='softmax'))
         # self.model.add(BatchNormalization())
         self.model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'])  # adam gave
         # better results, but adadelta used everywhere
@@ -65,7 +66,7 @@ class Classify:
         # shuffle is true by default (shuffle batches)
         """self.model.fit_generator(self.generator(),
         samples_per_epoch=50000, nb_epoch=10)"""
-        output = LabelBinarizer().fit(range(AppConfig.getNumLanguages())).transform(y)
+        output = LabelBinarizer().fit(range(AppConfig.getNumLanguages())).transform(Y)
         self.model.fit(X, output, batch_size=AppConfig.getBatchSize(), nb_epoch=AppConfig.getNumberEpochs())
 
     def predict(self, feature):

@@ -12,7 +12,6 @@ process = psutil.Process(os.getpid())
 
 class scoreModel:
     def __init__(self, languages, epoch):
-
         self.label = dict()
         self.languages = languages
         # self.featureSets = featureSets
@@ -261,13 +260,11 @@ class scoreModel:
             analysis.append((language, float(success*100)/Total))
         return analysis
 
-a = datetime.datetime.now()
+# a = datetime.datetime.now()
 X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
 # X.populateFeatureVector()
-#X.createAudioDumps()
+X.createAudioDumps()
 files = X.dumpFeatureVector()
-# print "Files",files
-# print AppConfig.getNumFeatures()*AppConfig.getContextWindowSize()
 X.train()
 # b = datetime.datetime.now()
 # c = b-a

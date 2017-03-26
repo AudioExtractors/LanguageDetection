@@ -1,23 +1,23 @@
 import os
-trainingDataSize = 10010  # must be greater than 2*contextWindow
+trainingDataSize = 479*10  # must be greater than 2*contextWindow
 base_dir = "Data"
 test_base_dir = "Test"
 dump_train_dir = "Samples"
 dump_base_dir = "Dump"
-hiddenLayer = (9,7)  # approx (2/3)*len(featureSet)*contextWindow
+hiddenLayer = (9, 7)  # approx (2/3)*len(featureSet)*contextWindow
 windowSize = 1500  # In number of frames
 windowHop = 1000  # In number of frames
-languages = ["en","de","it"]
+languages = ["en", "de", "it"]
 test_epoch = 300
 contextWindowSize = 1  # -x/2 to +x/2 number of frames
 maxTrainingSamples = 1210
 maxTestSamples = 1210
 trainingBatchSize = 78*1000000  # 78 features * 100 samples
-averageFramesPerSample =8   # each clip treated as one sample by average out
+averageFramesPerSample = 8  # each clip treated as one sample by average out
 batch_size = 50
-nb_epoch = 20
+nb_epoch = 15
 numberOfAverageStats = 2
-fixedAudioLength=1.5 #seconds
+fixedAudioLength = 1.5  # seconds
 featureNames = ['Zero Crossing Rate', 'Energy', 'Entropy of Energy', 'Spectral Centroid', 'Spectral Spread',
                 'Spectral Entropy', 'Spectral Flux', 'Spectral Rolloff', 'MFCC 1', 'MFCC 2', 'MFCC 3', 'MFCC 4',
                 'MFCC 5', 'MFCC 6', 'MFCC 7', 'MFCC 8', 'MFCC 9', 'MFCC 10', 'MFCC 11', 'MFCC 12', 'MFCC 13',
@@ -28,13 +28,22 @@ featureNames = ['Zero Crossing Rate', 'Energy', 'Entropy of Energy', 'Spectral C
                 "MFCC Delta 9", "MFCC Delta 10", "MFCC Delta 11", "MFCC Delta 12", "MFCC Delta 13", "MFCC Delta Delta 1"
                 , "MFCC Delta Delta 2", "MFCC Delta Delta 3", "MFCC Delta Delta 4", "MFCC Delta Delta 5",
                 "MFCC Delta Delta 6", "MFCC Delta Delta 7", "MFCC Delta Delta 8", "MFCC Delta Delta 9",
-                "MFCC Delta Delta 10", "MFCC Delta Delta 11", "MFCC Delta Delta 12", "MFCC Delta Delta 13"]
+                "MFCC Delta Delta 10", "MFCC Delta Delta 11", "MFCC Delta Delta 12", "MFCC Delta Delta 13", "Formant 1",
+                "Formant 2", "Formant 3", "Formant 4", "Formant 5"]
 
 
 # featureNumbers = [i for i in range(34)]  # Can be changed accordingly
-featureNumbers = [i for i in range(8, 21)]
-for i in range(34, 60):
+featureNumbers = []
+# featureNumbers.append(0)
+# featureNumbers.append(1)
+for i in range(9, 21):
     featureNumbers.append(i)
+for i in range(35, 47):
+    featureNumbers.append(i)
+for i in range(48, 60):
+    featureNumbers.append(i)
+# for i in range(60, 62):
+#     featureNumbers.append(i)
 
 
 def getFilePathTraining(language, number):
