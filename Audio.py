@@ -33,7 +33,13 @@ class Audio:
             self.signal = signal
             self.fs = 16000
             self.noFrames = len(self.signal)
-
+        if AppConfig.fixedAudioLength!=0.0:
+            mid=self.noFrames/2
+            halfFrame=int(self.fs*AppConfig.fixedAudioLength*0.5)
+            left=max(0,mid-halfFrame)
+            right=min(mid+halfFrame,self.noFrames)
+            self.signal=self.signal[left:right]
+            self.noFrames=len(self.signal)
         if self.fs != 16000:
             print "sampling Error.."
             return
@@ -146,7 +152,8 @@ class Audio:
         # print "Saving..",path,self.signal[0:60]
 
 """G=Audio(AppConfig.getFilePathTraining("en",20))
-print G.getNoOfFrames()/AppConfig.getWindowHop()
+print G.getNoOfFrames()
+print float(G.getNoOfFrames())/16000
 #G.publish()
 
 sig=np.load(os.path.join("Samples",G.language,G.name+".npy"))
