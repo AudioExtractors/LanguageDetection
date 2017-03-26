@@ -101,6 +101,8 @@ class Audio:
     def getAverageFeatureVector(self, std=False):  # std true means standard deviation to be included as well
         featureVector = self.getFeatureVector()
         featureVector = self.makeContextWindows(featureVector)
+        if featureVector.size==0:
+            return featureVector
         averageFeatureVector = self.makeAverageWindows(featureVector, AppConfig.averageFramesPerSample)
         if std == True:
             stdFeatureVector = self.makeAverageWindows(featureVector, AppConfig.averageFramesPerSample, std=True)
@@ -113,6 +115,7 @@ class Audio:
     def makeAverageWindows(self, languageFeature, averageFramesPerSample, std=False):
         averageFeature = []
         noOfFrames = len(languageFeature)
+        #averagingWindowSize=averageFramesPerSample
         averagingWindowSize = max(1, noOfFrames/averageFramesPerSample)
         start = 0
         end = averagingWindowSize

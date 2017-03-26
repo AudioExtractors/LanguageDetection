@@ -129,7 +129,7 @@ import random as rd
 
 
 def getTrainingSamples(language, rng=None, maxEpoch=AppConfig.getTrainingDataSize(), max=AppConfig.maxTrainingSamples,
-                       random="True"):
+                       random="False"):
     samples = []
     if random == "True":
         if rng is None:
@@ -169,7 +169,7 @@ def getDumpTrainingSample(language):
     return samples
 
 
-def getTestSamples(language, rng=None, maxEpoch=AppConfig.getTrainingDataSize(), max=AppConfig.maxTestSamples, random="True"):
+def getTestSamples(language, rng=None, maxEpoch=AppConfig.getTrainingDataSize(), max=AppConfig.maxTestSamples, random="False"):
     samples = []
     if random == "True":
         if rng is None:
@@ -194,7 +194,6 @@ def getTestSamples(language, rng=None, maxEpoch=AppConfig.getTrainingDataSize(),
 def getFeatureDumpSize():
     dumpList = []
     for i in os.walk("Dump"):
-        # print i[0], i[2]
         for dumps in i[2]:
             dumpList.append(i[0]+"\\"+dumps)
     return len(dumpList)/(2*AppConfig.getNumLanguages())

@@ -146,7 +146,7 @@ class scoreModel:
             # print "current memory usage :1", (process.memory_info().rss)/(1024*1024)
             # print "current memory usage :2", (process.memory_info().rss)/(1024*1024)
             if underFetching == True:
-                print "Under Fetched Data Samples"
+                print "Under Fetched Data Samples expected",self.epoch,"received",inputSize
         return noOfFilesTrained
 
     # def assertFeatureVector(self, X, Y):
@@ -250,18 +250,21 @@ class scoreModel:
             print language
             for num in range(AppConfig.getTestEpoch()):
                 progress = num*100/Total
-                sys.stdout.write(str(progress) + " ")
-                subcandidates = self.predict(Audio.Audio(AppConfig.getFilePathTest(language, num)))
-                if subcandidates[0][1] == self.label[language]:
-                    success += 1
+                #sys.stdout.write(str(progress) + " ")
+                try:
+                    subcandidates = self.predict(Audio.Audio(AppConfig.getFilePathTest(language, num)))
+                    if subcandidates[0][1] == self.label[language]:
+                        success += 1
+                except:
+                    print "fail"
+                    continue
             analysis.append((language, float(success*100)/Total))
-            print ""
         return analysis
 
 a = datetime.datetime.now()
 X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
 # X.populateFeatureVector()
-# X.createAudioDumps()
+#X.createAudioDumps()
 files = X.dumpFeatureVector()
 # print "Files",files
 # print AppConfig.getNumFeatures()*AppConfig.getContextWindowSize()
