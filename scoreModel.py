@@ -1,5 +1,4 @@
 import AudioIO
-import Audio
 import AppConfig
 from matplotlib.pyplot import *
 import datetime
@@ -82,14 +81,15 @@ class scoreModel:
                     combineDumpLanguageFeature = np.vstack((combineDumpLanguageFeature, X))
                     combineDumpLanguageLabel = np.concatenate((combineDumpLanguageLabel, Y))
             # print combineDumpLanguageLabel
+
             X, self.mu, self.sigma = self.normalise(combineDumpLanguageFeature)
             self.classifier.train(X, combineDumpLanguageLabel)
 
     def createAudioDumps(self):
         for language in self.languages:
+            print "Dumping Audio Samples of", language
             AudioIO.dumpAudioFiles(language)
 
-    # Needs to be updated
     def dumpFeatureVector(self):
         """
         :return: return list of number of files trained for each language
@@ -145,7 +145,9 @@ class scoreModel:
             # print "current memory usage :1", (process.memory_info().rss)/(1024*1024)
             # print "current memory usage :2", (process.memory_info().rss)/(1024*1024)
             if underFetching == True:
-                print "Under Fetched Data Samples expected",self.epoch,"received",inputSize
+                print "Under Fetched Data Samples expected", self.epoch, "received", inputSize
+            else:
+                print "Fetched Data Samples expected", inputSize
         return noOfFilesTrained
 
     # def assertFeatureVector(self, X, Y):
@@ -247,7 +249,7 @@ class scoreModel:
             Total = AppConfig.getTestEpoch()
             success = 0
             print language
-            samples=AudioIO.getDumpTestSample(language)
+            samples = AudioIO.getDumpTestSample(language)
             for sample in samples:
                 try:
                     subcandidates = self.predict(sample)
@@ -262,7 +264,7 @@ class scoreModel:
 # a = datetime.datetime.now()
 X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
 # X.populateFeatureVector()
-#X.createAudioDumps()
+# X.createAudioDumps()
 files = X.dumpFeatureVector()
 # print "Files",files
 # print AppConfig.getNumFeatures()*AppConfig.getContextWindowSize()

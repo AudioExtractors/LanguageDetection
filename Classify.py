@@ -1,11 +1,14 @@
+import numpy
+numpy.random.seed(1337)
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from keras.regularizers import activity_l2, activity_l1l2
 # from keras.layers.normalization import BatchNormalization  # Batch Normalization can be added
 from sklearn.preprocessing import LabelBinarizer
+from sklearn.utils import shuffle
 import collections
 import AppConfig
-import numpy
+import matplotlib.pyplot as plt
 
 
 class Classify:
@@ -40,7 +43,7 @@ class Classify:
             self.model.add(Dropout(0.2))
             # self.model.add(BatchNormalization())
         # self.model.add(Dense(2, activation='sigmoid'))
-        self.model.add(Dense(AppConfig.getNumLanguages(), activity_regularizer=activity_l2(), activation='softmax'))
+        self.model.add(Dense(AppConfig.getNumLanguages(), activity_regularizer=activity_l2(), activation='sigmoid'))
         # self.model.add(BatchNormalization())
         self.model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'])  # adam gave
         # better results, but adadelta used everywhere
@@ -67,7 +70,25 @@ class Classify:
         """self.model.fit_generator(self.generator(),
         samples_per_epoch=50000, nb_epoch=10)"""
         output = LabelBinarizer().fit(range(AppConfig.getNumLanguages())).transform(Y)
-        self.model.fit(X, output, batch_size=AppConfig.getBatchSize(), nb_epoch=AppConfig.getNumberEpochs())
+        X, output = shuffle(X, output, random_state=10)
+        history = self.model.fit(X, output, batch_size=AppConfig.getBatchSize(),
+                                 nb_epoch=AppConfig.getNumberEpochs())
+        # print(history.history.keys())
+        # plt.plot(history.history['acc'])
+        # plt.plot(history.history['val_acc'])
+        # plt.title('model accuracy')
+        # plt.ylabel('accuracy')
+        # plt.xlabel('epoch')
+        # plt.legend(['train', 'test'], loc='upper left')
+        # plt.show()
+        # # summarize history for loss
+        # plt.plot(history.history['loss'])
+        # plt.plot(history.history['val_loss'])
+        # plt.title('model loss')
+        # plt.ylabel('loss')
+        # plt.xlabel('epoch')
+        # plt.legend(['train', 'test'], loc='upper left')
+        # plt.show()
 
     def predict(self, feature):
         """
