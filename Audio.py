@@ -154,8 +154,8 @@ class Audio:
     def getNoOfFrames(self):
         return self.noFrames
 
-    def publish(self):
-        path = os.path.join("Samples", self.language, self.name)
+    def publish(self,dir):
+        path = os.path.join(dir, self.language, self.name)
         np.save(path, self.signal)
         # print "Saving..",path,self.signal[0:60]
 

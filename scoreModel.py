@@ -247,11 +247,10 @@ class scoreModel:
             Total = AppConfig.getTestEpoch()
             success = 0
             print language
-            for num in range(AppConfig.getTestEpoch()):
-                progress = num*100/Total
-                #sys.stdout.write(str(progress) + " ")
+            samples=AudioIO.getDumpTestSample(language)
+            for sample in samples:
                 try:
-                    subcandidates = self.predict(Audio.Audio(AppConfig.getFilePathTest(language, num)))
+                    subcandidates = self.predict(sample)
                     if subcandidates[0][1] == self.label[language]:
                         success += 1
                 except:
@@ -263,8 +262,10 @@ class scoreModel:
 # a = datetime.datetime.now()
 X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
 # X.populateFeatureVector()
-X.createAudioDumps()
-files = X.dumpFeatureVector()
+#X.createAudioDumps()
+#files = X.dumpFeatureVector()
+# print "Files",files
+# print AppConfig.getNumFeatures()*AppConfig.getContextWindowSize()
 X.train()
 # b = datetime.datetime.now()
 # c = b-a

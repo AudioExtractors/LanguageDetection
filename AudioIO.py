@@ -141,7 +141,7 @@ def getTrainingSamples(language, rng=None, maxEpoch=AppConfig.getTrainingDataSiz
             randomSample = Audio.Audio(AppConfig.getFilePathTraining(language, i))
             samples.append(randomSample)
         return samples
-    if rng is None:
+    if rng is None:#most imp
         for i in range(max):
             sample = Audio.Audio(AppConfig.getFilePathTraining(language, i))
             samples.append(sample)
@@ -155,12 +155,28 @@ def getTrainingSamples(language, rng=None, maxEpoch=AppConfig.getTrainingDataSiz
 def dumpAudioFiles(language):
     samples = getTrainingSamples(language)
     for sample in samples:
-        sample.publish()
+        sample.publish(AppConfig.dump_train_dir)
 
+def dumpTestFiles(language):
+    samples=getTestSamples(language)
+    for sample in samples:
+        print sample
+        sample.publish(AppConfig.dump_test_dir)
+
+
+def getDumpTestSample(language):
+    samples = []
+    for files in os.walk(os.path.join(AppConfig.dump_test_dir, language)):
+        for file in files[2]:
+            path = os.path.join(str(files[0]), file)
+            sig = np.load(path)
+            audio = Audio.Audio(path, sig)
+            samples.append(audio)
+    return samples
 
 def getDumpTrainingSample(language):
     samples = []
-    for files in os.walk(os.path.join("Samples", language)):
+    for files in os.walk(os.path.join(AppConfig.dump_train_dir, language)):
         for file in files[2]:
             path = os.path.join(str(files[0]), file)
             sig = np.load(path)
@@ -169,7 +185,7 @@ def getDumpTrainingSample(language):
     return samples
 
 
-def getTestSamples(language, rng=None, maxEpoch=AppConfig.getTrainingDataSize(), max=AppConfig.maxTestSamples, random="False"):
+def getTestSamples(language, rng=None, max=AppConfig.test_epoch, random="False"):
     samples = []
     if random == "True":
         if rng is None:
@@ -180,7 +196,7 @@ def getTestSamples(language, rng=None, maxEpoch=AppConfig.getTrainingDataSize(),
             randomSample = Audio.Audio(AppConfig.getFilePathTest(language, i))
             samples.append(randomSample)
         return samples
-    if rng is None:
+    if rng is None:#most imp
         for i in range(max):
             sample = Audio.Audio(AppConfig.getFilePathTest(language, i))
             samples.append(sample)
@@ -199,9 +215,9 @@ def getFeatureDumpSize():
     return len(dumpList)/(2*AppConfig.getNumLanguages())
 
 if __name__ == "__main__":
-    x = getDumpTrainingSample("en")
-    for i in x:
-        print i.path
+    for language in AppConfig.languages:
+        print language
+        dumpTestFiles(language)
     """
     x=getTestSamples("de",random="True",rng=(500,700),max=3,maxEpoch=100000)
     print len(x)
@@ -225,4 +241,5 @@ if __name__ == "__main__":
     MFCCExtract(file4,1,'gd')"""
     # spectrogramPlot("Trash//Dutch//400-499//dutch_train403.wav",1)
     # spectrogramPlot("Trash//DutchNoise//29.wav",2)
+
 
