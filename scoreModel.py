@@ -83,7 +83,7 @@ class scoreModel:
                     combineDumpLanguageLabel = np.concatenate((combineDumpLanguageLabel, Y))
             # print combineDumpLanguageLabel
             X, self.mu, self.sigma = self.normalise(combineDumpLanguageFeature)
-            self.classifier.train(combineDumpLanguageFeature, combineDumpLanguageLabel)
+            self.classifier.train(X, combineDumpLanguageLabel)
 
     def createAudioDumps(self):
         for language in self.languages:
@@ -263,7 +263,7 @@ class scoreModel:
 X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
 # X.populateFeatureVector()
 #X.createAudioDumps()
-#files = X.dumpFeatureVector()
+files = X.dumpFeatureVector()
 # print "Files",files
 # print AppConfig.getNumFeatures()*AppConfig.getContextWindowSize()
 X.train()
