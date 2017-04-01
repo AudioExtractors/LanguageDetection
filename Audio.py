@@ -22,14 +22,16 @@ class Audio:
             self.language = path_list[indexOfLanguage]
             self.name = path_list[indexOfName]
             (self.fs, signal) = wavfile.read(path)
-            segments = aS.silenceRemoval(signal, self.fs, 0.020, 0.020, smoothWindow=1.0, Weight=0.4, plot=False)
-            self.voicedSignal = np.array([], dtype=np.int16)
-            for segment in segments:
-                voicedStart = int(segment[0]*self.fs)
-                voicedEnd = int(segment[1]*self.fs)
-                self.voicedSignal = np.append(self.voicedSignal, signal[voicedStart:voicedEnd])
-            self.noFrames = len(self.voicedSignal)
-            self.signal = self.voicedSignal
+            # segments = aS.silenceRemoval(signal, self.fs, 0.020, 0.020, smoothWindow=1.0, Weight=0.4, plot=False)
+            # self.voicedSignal = np.array([], dtype=np.int16)
+            # for segment in segments:
+            #     voicedStart = int(segment[0]*self.fs)
+            #     voicedEnd = int(segment[1]*self.fs)
+            #     self.voicedSignal = np.append(self.voicedSignal, signal[voicedStart:voicedEnd])
+            # self.noFrames = len(self.voicedSignal)
+            # self.signal = self.voicedSignal
+            self.signal = signal
+            self.noFrames = len(self.signal)
         else:
             self.signal = signal
             self.fs = 16000
