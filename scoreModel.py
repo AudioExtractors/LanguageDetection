@@ -6,6 +6,7 @@ import sys
 import Classify
 import psutil
 import os
+from feature_selection import FeatureSelection
 process = psutil.Process(os.getpid())
 
 
@@ -23,6 +24,8 @@ class scoreModel:
             self.label[language] = i
         self.mu = 0
         self.sigma = 0
+        #TODO: replace 78 with number of features and put 20 in appconfig as number of feture selected
+        self.sel = FeatureSelection(AppConfig.getNumLanguages(), 78, 20)
 
     # Needs to be updated
     # def populateFeatureVector(self):
@@ -65,6 +68,16 @@ class scoreModel:
     #     self.classifier.train(np.array(X), Y)
     #     return noOfFilesTrained
 
+    def selectFeature(self):
+        dumpSize = AudioIO.getFeatureDumpSize()
+        for i in range(dumpSize):
+            for language in self.languages:
+                X = np.load("Dump//dumpX_"+language+str(i)+".npy")
+                y = np.load("Dump//dumpY_"+language+str(i)+".npy")
+                self.sel.batchData(self.normConv(X, self.mu, self.sigma), y)
+        self.sel.fit()
+        print self.sel.mask
+
     def train(self):
         dumpSize = AudioIO.getFeatureDumpSize()
         # print "DumpSize: ", dumpSize
@@ -83,7 +96,8 @@ class scoreModel:
             # print combineDumpLanguageLabel
 
             X, self.mu, self.sigma = self.normalise(combineDumpLanguageFeature)
-            self.classifier.train(X, combineDumpLanguageLabel)
+            # X_new = self.sel.transform(X) this will eliminate some coloumns
+            #self.classifier.train(X, combineDumpLanguageLabel)
 
     def createAudioDumps(self):
         for language in self.languages:
@@ -265,11 +279,12 @@ class scoreModel:
 X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
 # X.populateFeatureVector()
 # X.createAudioDumps()
-files = X.dumpFeatureVector()
+#files = X.dumpFeatureVector()
 # print "Files",files
-# print AppConfig.getNumFeatures()*AppConfig.getContextWindowSize()
+# print AppConfig.getNumFeatures()*AppConfig.
 X.train()
+X.selectFeature()
 # b = datetime.datetime.now()
 # c = b-a
 # print c.seconds
-print X.analyse()
+#print X.analyse()
