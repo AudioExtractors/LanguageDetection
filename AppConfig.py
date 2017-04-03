@@ -1,5 +1,5 @@
 import os
-trainingDataSize = 1199*40  # must be greater than 2*contextWindow
+trainingDataSize = 1199*80  # must be greater than 2*contextWindow
 hiddenLayer = (15)  # approx (2/3)*len(featureSet)*contextWindow
 windowSize = 400  # In number of frames
 windowHop = 160  # In number of frames
@@ -8,12 +8,13 @@ test_epoch = 300
 contextWindowSize = 4  # -x/2 to +x/2 number of frames
 maxTrainingSamples = 1210
 maxTestSamples = 1210
-trainingBatchSize = 78*1000000  # 78 features * 100 samples
-averageFramesPerSample = 40  # each clip treated as one sample by average out
+trainingBatchSize = 7000000 # 78 features * 100 samples
+averageFramesPerSample = 1000000000000  # each clip treated as one sample by average out
 batch_size = 32
 nb_epoch = 20
 numberOfAverageStats = 2
 fixedAudioLength = 1.5  # seconds
+selFeatures=30
 ####GMM Features
 gmmWindowSize=400
 gmmWindowHop=250

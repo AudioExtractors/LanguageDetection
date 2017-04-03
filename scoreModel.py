@@ -24,8 +24,10 @@ class scoreModel:
         for i, language in enumerate(languages):
             self.label[language] = i
         #TODO: replace 78 with number of features and put 20 in appconfig as number of feture selected
-        self.sel = FeatureSelection(AppConfig.getNumLanguages(), 78, 20)
-        self.norm = FeatureNormalise(78)
+        self.sel = FeatureSelection(AppConfig.getNumLanguages(), AppConfig.getNumFeatures() * AppConfig.getNumberOfAverageStats() *
+                      AppConfig.getContextWindowSize(), AppConfig.selFeatures)
+        self.norm = FeatureNormalise(AppConfig.getNumFeatures() * AppConfig.getNumberOfAverageStats() *
+                      AppConfig.getContextWindowSize())
 
     def normFeature(self):
         dumpSize = AudioIO.getFeatureDumpSize()
@@ -61,9 +63,9 @@ class scoreModel:
                     combineDumpLanguageFeature = np.vstack((combineDumpLanguageFeature, X))
                     combineDumpLanguageLabel = np.concatenate((combineDumpLanguageLabel, Y))
             # print combineDumpLanguageLabel
-            # X_norm = self.norm.transform(combineDumpLanguageFeature) this will normalise data
-            # X = self.sel.transform(X_norm) this will eliminate some coloumns
-            # self.classifier.train(X, combineDumpLanguageLabel)
+            X_norm = self.norm.transform(combineDumpLanguageFeature)
+            X = self.sel.transform(X_norm)
+            self.classifier.train(X, combineDumpLanguageLabel)
 
     def createAudioDumps(self):
         for language in self.languages:
@@ -127,14 +129,14 @@ class scoreModel:
             if underFetching == True:
                 print "Under Fetched Data Samples expected", self.epoch, "received", inputSize
             else:
-                print "Fetched Data Samples expected", inputSize
+                print "Fetched Data Samples expected", inputSize,"and ",ct,"number of files have been dumped"
         return noOfFilesTrained
 
 
     def predict(self, audio):
         featureVector = audio.getAverageFeatureVector(std=True)
         normFeatureVector = self.norm.transform(featureVector)
-        return self.classifier.predict(normFeatureVector)
+        return self.classifier.predict(self.sel.transform(normFeatureVector))
 
     def analyse(self):
         """
@@ -160,19 +162,19 @@ class scoreModel:
             print language
             samples = AudioIO.getDumpTestSample(language)
             for sample in samples:
-                try:
-                    total += 1
-                    subcandidates = self.predict(sample)
-                    key=(language,self.languages[subcandidates[0][1]])
-                    confusionMatrix[key] += 1
-                    if subcandidates[0][1] == self.label[language]:
-                        success += 1
-                        log.write("[Correct]"+sample.getIndex()+" "+str(subcandidates)+"\n")
-                    else:
-                        log.write("[Wrong]"+sample.getIndex()+" "+str(subcandidates)+"\n")
-                except:
-                    print "fail"
-                    continue
+ #               try:
+                total += 1
+                subcandidates = self.predict(sample)
+                key=(language,self.languages[subcandidates[0][1]])
+                confusionMatrix[key] += 1
+                if subcandidates[0][1] == self.label[language]:
+                    success += 1
+                    log.write("[Correct]"+sample.getIndex()+" "+str(subcandidates)+"\n")
+                else:
+                    log.write("[Wrong]"+sample.getIndex()+" "+str(subcandidates)+"\n")
+#                except:
+#                    print "fail"
+#                    continue
             totalCount[language] = total
             analysis.append((language, float(success*100)/Total))
 
@@ -194,22 +196,22 @@ class scoreModel:
                     confusionMatrix[(language,language2)] /=float(totalCount[language])
         log.write("Confusion Matrix on Percentage of Samples:")
         log.write(str(confusionMatrix))
-
-
+        print "See logs in -",fileName
         return analysis
 
 # a = datetime.datetime.now()
 X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
 # X.populateFeatureVector()
 # X.createAudioDumps()
-#files = X.dumpFeatureVector()
+files = X.dumpFeatureVector()
 # print "Files",files
 # print AppConfig.getNumFeatures()*AppConfig.
 X.normFeature()
 X.selectFeature()
 X.train()
+print "dd"
 #X.selectFeature()
 # b = datetime.datetime.now()
 # c = b-a
 # print c.seconds
-#print X.analyse()
+print X.analyse()

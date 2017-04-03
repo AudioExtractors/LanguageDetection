@@ -22,10 +22,11 @@ class Classify:
         epoch = AppConfig.getTrainingDataSize()
         self.model = Sequential()
         if isinstance(hidden_layers, (collections.Sequence, numpy.ndarray)):
+            """AppConfig.getNumFeatures() * AppConfig.getNumberOfAverageStats() *
+                      AppConfig.getContextWindowSize()"""
             self.model.add(
                 Dense(hidden_layers[0],
-                      input_dim=AppConfig.getNumFeatures() * AppConfig.getNumberOfAverageStats() *
-                      AppConfig.getContextWindowSize(), activity_regularizer=activity_l2(), activation='sigmoid'))
+                      input_dim=AppConfig.selFeatures, activity_regularizer=activity_l2(), activation='sigmoid'))
             self.model.add(Dropout(0.2))
             # self.model.add(BatchNormalization())
             for num in range(1, len(hidden_layers)):
@@ -38,8 +39,7 @@ class Classify:
             #           input_dim=13, activation='sigmoid'))
             self.model.add(
                 Dense(hidden_layers,
-                      input_dim=AppConfig.getNumFeatures() * AppConfig.getNumberOfAverageStats() *
-                      AppConfig.getContextWindowSize(), activity_regularizer=activity_l2(), activation='sigmoid'))
+                      input_dim=AppConfig.selFeatures, activity_regularizer=activity_l2(), activation='sigmoid'))
             self.model.add(Dropout(0.2))
             # self.model.add(BatchNormalization())
         # self.model.add(Dense(2, activation='sigmoid'))
