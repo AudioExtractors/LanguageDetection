@@ -63,6 +63,7 @@ class scoreModel:
                     combineDumpLanguageFeature = np.vstack((combineDumpLanguageFeature, X))
                     combineDumpLanguageLabel = np.concatenate((combineDumpLanguageLabel, Y))
             # print combineDumpLanguageLabel
+            # print i, len(combineDumpLanguageFeature)
             X_norm = self.norm.transform(combineDumpLanguageFeature)
             X = self.sel.transform(X_norm)
             self.classifier.train(X, combineDumpLanguageLabel)
@@ -199,6 +200,12 @@ class scoreModel:
         print "See logs in -",fileName
         return analysis
 
+    def saveNN(self, name):
+        self.classifier.save(name)
+
+    def loadNN(self, name):
+        self.classifier.load(name)
+
 # a = datetime.datetime.now()
 X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
 # X.populateFeatureVector()
@@ -209,8 +216,9 @@ files = X.dumpFeatureVector()
 X.normFeature()
 X.selectFeature()
 X.train()
-print "dd"
-#X.selectFeature()
+# X.saveNN("NN")
+# X.loadNN("NN")
+# X.selectFeature()
 # b = datetime.datetime.now()
 # c = b-a
 # print c.seconds
