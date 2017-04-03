@@ -72,15 +72,15 @@ class Audio:
         Deltas2 = numpy.transpose(Deltas2)
         featureVector = []
 
-        # start = 0
+        start = 0
         for frames in range(0, len(featureVectorTemp)):
             Temp = numpy.append(featureVectorTemp[frames], Deltas[frames])
             Temp = numpy.append(Temp, Deltas2[frames])
-            # end = start + AppConfig.getWindowSize()
-            # if end >= len(self.signal):
-            #    end = len(self.signal) - 1
-            # Temp = numpy.append(Temp, formants.getFormants(self.fs, self.signal[start:end]))
-            # start += AppConfig.getWindowHop()
+            end = start + AppConfig.getWindowSize()
+            if end >= len(self.signal):
+               end = len(self.signal) - 1
+            Temp = numpy.append(Temp, formants.getFormants(self.fs, self.signal[start:end]))
+            start += AppConfig.getWindowHop()
             featureVector.append(Temp)
 
         featureVector = numpy.array(featureVector)

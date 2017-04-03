@@ -22,28 +22,25 @@ class Classify:
         epoch = AppConfig.getTrainingDataSize()
         self.model = Sequential()
         if isinstance(hidden_layers, (collections.Sequence, numpy.ndarray)):
-            """AppConfig.getNumFeatures() * AppConfig.getNumberOfAverageStats() *
-                      AppConfig.getContextWindowSize()"""
-            self.model.add(
-                Dense(hidden_layers[0],
-                      input_dim=AppConfig.selFeatures, activity_regularizer=activity_l2(), activation='sigmoid'))
+            self.model.add(Dense(hidden_layers[0], input_dim=AppConfig.selFeatures, activity_regularizer=activity_l2(),
+                      activation='sigmoid'))
             self.model.add(Dropout(0.2))
             # self.model.add(BatchNormalization())
             for num in range(1, len(hidden_layers)):
-                self.model.add(Dense(hidden_layers[num], activity_regularizer=activity_l2(), activation='sigmoid'))
-                # self.model.add(Dropout(0.3))
+                self.model.add(Dense(hidden_layers[num], activation='sigmoid'))
+                # self.model.add(Dropout(0.1))
                 # self.model.add(BatchNormalization())
         else:
             # self.model.add(
             #     Dense(hidden_layers, activity_regularizer=activity_l2(),
             #           input_dim=13, activation='sigmoid'))
             self.model.add(
-                Dense(hidden_layers,
-                      input_dim=AppConfig.selFeatures, activity_regularizer=activity_l2(), activation='sigmoid'))
+                Dense(hidden_layers, input_dim=AppConfig.selFeatures, activity_regularizer=activity_l2(),
+                      activation='sigmoid'))
             self.model.add(Dropout(0.2))
             # self.model.add(BatchNormalization())
         # self.model.add(Dense(2, activation='sigmoid'))
-        self.model.add(Dense(AppConfig.getNumLanguages(), activity_regularizer=activity_l2(), activation='sigmoid'))
+        self.model.add(Dense(AppConfig.getNumLanguages(), activation='sigmoid'))
         # self.model.add(BatchNormalization())
         self.model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'])  # adam gave
         # better results, but adadelta used everywhere
@@ -73,7 +70,6 @@ class Classify:
         X, output = shuffle(X, output, random_state=10)
         history = self.model.fit(X, output, batch_size=AppConfig.getBatchSize(),
                                  nb_epoch=AppConfig.getNumberEpochs())
-        # print(history.history.keys())
         # plt.plot(history.history['acc'])
         # plt.plot(history.history['val_acc'])
         # plt.title('model accuracy')
