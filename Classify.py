@@ -93,7 +93,7 @@ class Classify:
     def predict(self, feature):
         """
         :param feature:
-        :return:list of subcanditates with probabilities
+        :return: list of subcanditates with probabilities
         """
         prediction_vector = self.model.predict_proba(feature, verbose=0)
         probability = dict()

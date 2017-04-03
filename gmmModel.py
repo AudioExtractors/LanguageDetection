@@ -22,6 +22,8 @@ class languageMixtureModel:
         self.sigma = 0
         self.mp={}
 
+
+
     def dumpFeatureVector(self):
         """
         :return: return list of number of files trained for each language
@@ -101,14 +103,18 @@ class languageMixtureModel:
             Y=combineDumpLanguageLabel
             self.mixtureModel.fit(X)
             Ydash=self.mixtureModel.predict(X)
+            count=[0 for i in range(0,AppConfig.gmmComponents+1)]
             for i in range(1,len(Ydash)):
-                if (Y[i]==Y[i-1]):
-                    key=(Y[i],Ydash[i],Ydash[i-1])
-                    if key in self.mp:
-                        self.mp[key]+=1
-                    else:
-                        self.mp[key]=1
-            print len(self.mp)
+                #if (Y[i]==Y[i-1]):
+                key=(Y[i],Ydash[i])
+                count[Ydash[i]]+=1
+                if key in self.mp:
+                    self.mp[key]+=1
+                else:
+                    self.mp[key]=1
+            for k in self.mp:
+                self.mp[k]=float(self.mp[k])/float(count[k[1]])
+            print self.mp
 
     def predict(self, audio):
         featureVector = audio.getAverageFeatureVector(std=False)
@@ -118,7 +124,7 @@ class languageMixtureModel:
         for i in range(1,len(Y)):
             for language in self.languages:
                 L=self.label.get(language)
-                key = (L, Y[i], Y[i-1])
+                key = (L, Y[i])
                 if key in self.mp:
                     subCandidates.append((self.mp[key],L))
                 else:
@@ -159,8 +165,8 @@ class languageMixtureModel:
         return analysis
 
 X = languageMixtureModel()
-F=X.dumpFeatureVector()
-print F
+#F=X.dumpFeatureVector()
+#print F
 X.train()
 A=X.analyse()
 print A

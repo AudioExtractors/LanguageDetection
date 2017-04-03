@@ -27,47 +27,6 @@ class scoreModel:
         self.sel = FeatureSelection(AppConfig.getNumLanguages(), 78, 20)
         self.norm = FeatureNormalise(78)
 
-    # Needs to be updated
-    # def populateFeatureVector(self):
-    #     """
-    #     :return: return list of number of files trained for each language
-    #     """
-    #     languagesFeatures = []
-    #     X = []
-    #     Y = []
-    #     noOfFilesTrained = []
-    #     for language in self.languages:
-    #         print "Fetching Data for ", language
-    #         inputSize = 0
-    #         flag = 0
-    #         samples = AudioIO.getTrainingSamples(language, random="False")
-    #         print "yes"
-    #         ct = 0
-    #         for sample in samples:
-    #             featureVector = sample.getFullVector()
-    #             for frameFeature in featureVector:
-    #                 if inputSize >= self.epoch:
-    #                     noOfFilesTrained.append((language, sample.getIndex()))
-    #                     languagesFeatures.append(X)
-    #                     flag = 1
-    #                     break
-    #             X.append(featureVector)
-    #             print (len(X)*len(X[0])*64)/float(1024*1024*8), "..MB"
-    #             Y.append(self.label.get(language))
-    #             inputSize += 1
-    #             if flag == 1:
-    #                 break
-    #
-    #     print X
-    #     print "Fetched Feature Vector.."
-    #     X = self.normaliseFeatureVector(X)
-    #     print "Normalised Feature Vector.."
-    #     print "current memory usage : ", (process.memory_info().rss)/(1024*1024)
-    #     self.assertFeatureVector(X, Y)
-    #     print X
-    #     self.classifier.train(np.array(X), Y)
-    #     return noOfFilesTrained
-
     def normFeature(self):
         dumpSize = AudioIO.getFeatureDumpSize()
         for i in range(dumpSize):
@@ -102,7 +61,6 @@ class scoreModel:
                     combineDumpLanguageFeature = np.vstack((combineDumpLanguageFeature, X))
                     combineDumpLanguageLabel = np.concatenate((combineDumpLanguageLabel, Y))
             # print combineDumpLanguageLabel
-
             # X_norm = self.norm.transform(combineDumpLanguageFeature) this will normalise data
             # X = self.sel.transform(X_norm) this will eliminate some coloumns
             # self.classifier.train(X, combineDumpLanguageLabel)
@@ -172,105 +130,72 @@ class scoreModel:
                 print "Fetched Data Samples expected", inputSize
         return noOfFilesTrained
 
-    # def assertFeatureVector(self, X, Y):
-    #     if len(X) == len(Y):
-    #         print "Len Assert Pass", len(X)
-    #     for frameFeature in X:
-    #         if frameFeature.shape != X[0].shape:
-    #             print "Dimension Assert Fail"
-    #         for feature in frameFeature:
-    #             if not(0.0 <= feature <= 1.0):
-    #                 print "Fail"
-    #     print "Dimension Assert Pass", X[0].shape
 
     def predict(self, audio):
         featureVector = audio.getAverageFeatureVector(std=True)
         normFeatureVector = self.norm.transform(featureVector)
         return self.classifier.predict(normFeatureVector)
 
-    # def normaliseFeatureVector(self, X):
-    #     Xmin = np.min(X, axis=0)
-    #     Xmax = np.max(X, axis=0)
-    #     delta = np.subtract(X, Xmin)
-    #     diff = np.subtract(Xmax, Xmin)
-    #     for i, frame in enumerate(delta):
-    #         for j, value in enumerate(frame):
-    #             if diff[j] == 0.0:
-    #                 delta[i][j] = 1.0
-    #             else:
-    #                 delta[i][j] = delta[i][j]/diff[j]
-    #     return delta
-
-    # def plotFeature(self, language, type, fig, featNo, style, number):
-    #     X = []
-    #     figure(fig)
-    #     if type == "Train":
-    #         samples = AudioIO.getTrainingSamples(language, number)
-    #         for sample in samples:
-    #             featureVector = sample.getFeatureVector()
-    #             for framefeature in featureVector:
-    #                 for i, feature in enumerate(framefeature):
-    #                     if i == featNo:
-    #                         X.append(feature)
-    #     elif type == "Test":
-    #         samples = AudioIO.getTestSamples(language, number)
-    #         for sample in samples:
-    #             featureVector = sample.getFeatureVector()
-    #             for framefeature in featureVector:
-    #                 for i, feature in enumerate(framefeature):
-    #                     if i == featNo:
-    #                         X.append(feature)
-    #     plot(X, color=style[0], marker=style[1], alpha=style[2])
-    #
-    # def plotFeature2D(self, language, type, fig, featNo, featNo2, style, number):
-    #     X = []
-    #     Y = []
-    #     figure(fig)
-    #     if type == "Train":
-    #         samples = AudioIO.getTrainingSamples(language,number)
-    #         for sample in samples:
-    #             featureVector = sample.getFeatureVector()
-    #             for framefeature in featureVector:
-    #                 for i, feature in enumerate(framefeature):
-    #                     if i == featNo:
-    #                         X.append(feature)
-    #                     if i == featNo2:
-    #                         Y.append(feature)
-    #     elif type == "Test":
-    #         samples = AudioIO.getTestSamples(language, number)
-    #         for sample in samples:
-    #             featureVector = sample.getFeatureVector()
-    #             for framefeature in featureVector:
-    #                 for i, feature in enumerate(framefeature):
-    #                     if i == featNo:
-    #                         X.append(feature)
-    #                     if i == featNo2:
-    #                         Y.append(feature)
-    #     self.normaliseFeatureVector(X)
-    #     plot(X, Y, color=style[0], marker=style[1], alpha=style[2])
-    #
-    # def showPlot(self):
-    #     show()
-
     def analyse(self):
         """
         :return: list of percentage success with language
         """
+        fileName=os.path.join(AppConfig.logs_base_dir,"Log"+str(datetime.datetime.now().strftime("%m%d-%H-%M-%S")))
+        log=open(fileName+".txt",'w')
+        confusionMatrix={}
+        for language in self.languages:
+            for language2 in self.languages:
+                confusionMatrix[(language,language2)]=0
+
+        totalCount={}
+        for language in self.languages:
+            totalCount[language] = 0
+
         analysis = []
         for language in self.languages:
+            log.write("Testing for samples in "+language+"\n")
             Total = AppConfig.getTestEpoch()
             success = 0
+            total=0
             print language
             samples = AudioIO.getDumpTestSample(language)
             for sample in samples:
                 try:
+                    total += 1
                     subcandidates = self.predict(sample)
+                    key=(language,self.languages[subcandidates[0][1]])
+                    confusionMatrix[key] += 1
                     if subcandidates[0][1] == self.label[language]:
                         success += 1
+                        log.write("[Correct]"+sample.getIndex()+" "+str(subcandidates)+"\n")
+                    else:
+                        log.write("[Wrong]"+sample.getIndex()+" "+str(subcandidates)+"\n")
                 except:
                     print "fail"
                     continue
+            totalCount[language] = total
             analysis.append((language, float(success*100)/Total))
+
+        print confusionMatrix
+        sys.stdout.write("     ")
+        for language in self.languages:
+            print language+"   ",
+        for language in self.languages:
+
+            sys.stdout.write("\n"+language+"   ")
+            for language2 in self.languages:
+                print "%d" % confusionMatrix[(language,language2)]+"   ",
+        print "\n"
+
+        log.write("Confusion Matrix on number of Samples:")
+        log.write(str(confusionMatrix)+"\n"+"\n")
+        for language in self.languages:
+                for language2 in self.languages:
+                    confusionMatrix[(language,language2)] /=float(totalCount[language])
+        log.write("Confusion Matrix on Percentage of Samples:")
+        log.write(str(confusionMatrix))
+
+
         return analysis
 
 # a = datetime.datetime.now()
@@ -283,6 +208,7 @@ X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
 X.normFeature()
 X.selectFeature()
 X.train()
+#X.selectFeature()
 # b = datetime.datetime.now()
 # c = b-a
 # print c.seconds

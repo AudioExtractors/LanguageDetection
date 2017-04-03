@@ -1,28 +1,23 @@
 import os
-trainingDataSize = 1199  # must be greater than 2*contextWindow
-base_dir = "Data"
-test_base_dir = "Test"
-dump_train_dir = "Samples"
-dump_test_dir = "TestDump"
-dump_base_dir = "Dump"
-hiddenLayer = (10)  # approx (2/3)*len(featureSet)*contextWindow
+trainingDataSize = 1199*40  # must be greater than 2*contextWindow
+hiddenLayer = (15)  # approx (2/3)*len(featureSet)*contextWindow
 windowSize = 400  # In number of frames
 windowHop = 160  # In number of frames
 languages = ["de", "it", "en"]
 test_epoch = 300
-contextWindowSize = 10  # -x/2 to +x/2 number of frames
+contextWindowSize = 4  # -x/2 to +x/2 number of frames
 maxTrainingSamples = 1210
 maxTestSamples = 1210
 trainingBatchSize = 78*1000000  # 78 features * 100 samples
-averageFramesPerSample = 1  # each clip treated as one sample by average out
+averageFramesPerSample = 40  # each clip treated as one sample by average out
 batch_size = 32
-nb_epoch = 10
+nb_epoch = 20
 numberOfAverageStats = 2
 fixedAudioLength = 1.5  # seconds
 ####GMM Features
 gmmWindowSize=400
 gmmWindowHop=250
-gmmComponents=1024
+gmmComponents=50
 ####
 featureNames = ['Zero Crossing Rate', 'Energy', 'Entropy of Energy', 'Spectral Centroid', 'Spectral Spread',
                 'Spectral Entropy', 'Spectral Flux', 'Spectral Rolloff', 'MFCC 1', 'MFCC 2', 'MFCC 3', 'MFCC 4',
@@ -46,11 +41,19 @@ for i in range(9, 21):
     featureNumbers.append(i)
 for i in range(35, 47):
     featureNumbers.append(i)
+"""
 for i in range(48, 60):
-    featureNumbers.append(i)
+    featureNumbers.append(i)"""
 # for i in range(60, 62):
 #     featureNumbers.append(i)
 
+base_dir = "Data"
+test_base_dir = "Test"
+dump_train_dir = "Samples"
+dump_test_dir = "TestDump"
+dump_base_dir = "Dump"
+logs_base_dir="logs"
+gmmLogs_base_dir=os.path.join("logs","gmm")
 
 def getFilePathTraining(language, number):
     range_start = number - number % 100

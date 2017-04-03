@@ -6,7 +6,6 @@ from pyAudioAnalysis import audioFeatureExtraction
 from pyAudioAnalysis import audioSegmentation as aS
 import os
 import librosa
-import formants
 
 
 class Audio:
@@ -62,8 +61,8 @@ class Audio:
         Deltas = []
         Deltas2 = []
         for mfcc in range(8, 21):
-            delta = librosa.feature.delta(featureVectorTemp[mfcc])
-            delta2 = librosa.feature.delta(featureVectorTemp[mfcc], order=2)
+            delta = librosa.feature.delta(featureVectorTemp[mfcc],width=3)
+            delta2 = librosa.feature.delta(featureVectorTemp[mfcc],width=3, order=2)
             Deltas.append(delta)
             Deltas2.append(delta2)
         Deltas = numpy.array(Deltas)
