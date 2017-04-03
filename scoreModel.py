@@ -7,6 +7,7 @@ import Classify
 import psutil
 import os
 from feature_selection import FeatureSelection
+from feature_normalise import FeatureNormalise
 process = psutil.Process(os.getpid())
 
 
@@ -22,10 +23,9 @@ class scoreModel:
         self.inputClassVector = []  # ClassVector
         for i, language in enumerate(languages):
             self.label[language] = i
-        self.mu = 0
-        self.sigma = 0
         #TODO: replace 78 with number of features and put 20 in appconfig as number of feture selected
         self.sel = FeatureSelection(AppConfig.getNumLanguages(), 78, 20)
+        self.norm = FeatureNormalise(78)
 
     # Needs to be updated
     # def populateFeatureVector(self):
@@ -68,15 +68,23 @@ class scoreModel:
     #     self.classifier.train(np.array(X), Y)
     #     return noOfFilesTrained
 
+    def normFeature(self):
+        dumpSize = AudioIO.getFeatureDumpSize()
+        for i in range(dumpSize):
+            for language in self.languages:
+                X = np.load("Dump//dumpX_"+language+str(i)+".npy")
+                self.norm.batchData(X)
+        self.norm.fit()
+
     def selectFeature(self):
         dumpSize = AudioIO.getFeatureDumpSize()
         for i in range(dumpSize):
             for language in self.languages:
                 X = np.load("Dump//dumpX_"+language+str(i)+".npy")
                 y = np.load("Dump//dumpY_"+language+str(i)+".npy")
-                self.sel.batchData(self.normConv(X, self.mu, self.sigma), y)
+                self.sel.batchData(self.norm.transform(X), y)
         self.sel.fit()
-        print self.sel.mask
+        #print self.sel.mask
 
     def train(self):
         dumpSize = AudioIO.getFeatureDumpSize()
@@ -95,9 +103,9 @@ class scoreModel:
                     combineDumpLanguageLabel = np.concatenate((combineDumpLanguageLabel, Y))
             # print combineDumpLanguageLabel
 
-            X, self.mu, self.sigma = self.normalise(combineDumpLanguageFeature)
-            # X_new = self.sel.transform(X) this will eliminate some coloumns
-            #self.classifier.train(X, combineDumpLanguageLabel)
+            # X_norm = self.norm.transform(combineDumpLanguageFeature) this will normalise data
+            # X = self.sel.transform(X_norm) this will eliminate some coloumns
+            # self.classifier.train(X, combineDumpLanguageLabel)
 
     def createAudioDumps(self):
         for language in self.languages:
@@ -177,7 +185,7 @@ class scoreModel:
 
     def predict(self, audio):
         featureVector = audio.getAverageFeatureVector(std=True)
-        normFeatureVector = self.normConv(featureVector, self.mu, self.sigma)
+        normFeatureVector = self.norm.transform(featureVector)
         return self.classifier.predict(normFeatureVector)
 
     # def normaliseFeatureVector(self, X):
@@ -192,16 +200,6 @@ class scoreModel:
     #             else:
     #                 delta[i][j] = delta[i][j]/diff[j]
     #     return delta
-
-    def normalise(self, X):
-        mu = np.mean(X, axis=0)
-        sigma = np.std(X, axis=0, ddof=1)
-        X_norm = (X-mu)/sigma
-        return X_norm, mu, sigma
-
-    # Converts test data to a format on which NN was trained
-    def normConv(self, X, mu, sigma):
-        return (X-mu)/sigma
 
     # def plotFeature(self, language, type, fig, featNo, style, number):
     #     X = []
@@ -282,8 +280,9 @@ X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
 #files = X.dumpFeatureVector()
 # print "Files",files
 # print AppConfig.getNumFeatures()*AppConfig.
-X.train()
+X.normFeature()
 X.selectFeature()
+X.train()
 # b = datetime.datetime.now()
 # c = b-a
 # print c.seconds
