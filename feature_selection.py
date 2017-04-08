@@ -55,13 +55,15 @@ class FeatureSelection:
         Call function batchData to train on data.
         After whole data is received call fit and transform
     """
-    def __init__(self, n_classes, n_features,k=10):
+    def __init__(self, n_classes, n_features, labels=-1, k=10):
         self.count_ = 0
         self.k = k
         self.observed = np.zeros((n_classes, n_features), dtype=np.float64)
         self.feature_count = np.zeros((1, n_features), dtype=np.float64)
         self.class_prob = np.zeros((1, n_classes), dtype=np.float64)
-        self.label = LabelBinarizer().fit( range(n_classes) )
+        if labels==-1:
+            labels = range(n_classes)
+        self.label = LabelBinarizer().fit( labels )
         self.scores_ = np.zeros(n_features, dtype=np.float64)
         self.pvalues_ = np.zeros(n_features, dtype=np.float64)
         self.mask = np.zeros(n_features, dtype=bool)
@@ -93,7 +95,7 @@ class FeatureSelection:
 if __name__ == "__main__":
     b=2
     X = np.array([ [1,1,1,1], [2,2,2,2], [1,1,3,3], [2,2,3,4] ])
-    y = np.array( [0,1,2,3] )
+    y = np.array( [0,2,2,0] )
     Y = LabelBinarizer().fit_transform(y)
     if Y.shape[1] == 1:
         Y = np.append(1 - Y, Y, axis=1)
@@ -109,7 +111,7 @@ if __name__ == "__main__":
     X_new = sel.transform(X)
     print X_new
     print "------with batch data------"
-    f = FeatureSelection(X.shape[1],Y.shape[1],k=2)
+    f = FeatureSelection(Y.shape[1],X.shape[1],labels=[0,2],k=2)
     f.batchData(X1,y1)
     f.batchData(X2,y2)
     f.fit()
