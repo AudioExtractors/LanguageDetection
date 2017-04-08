@@ -24,7 +24,9 @@ class FeatureNormalise:
         self.sigma = np.sqrt((self.x2 - 2*self.mu*self.x + self.count_*self.mu*self.mu)/(self.count_-1) )
 
     def transform(self, X):
-        return (X-self.mu)/self.sigma
+        X = (X-self.mu)/self.sigma
+        X[np.isnan(X)] = 0
+        return X
 
 
 # Tester
