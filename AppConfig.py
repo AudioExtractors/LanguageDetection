@@ -1,20 +1,24 @@
 import os
-trainingDataSize = 1199*80  # must be greater than 2*contextWindow
-hiddenLayer = (15)  # approx (2/3)*len(featureSet)*contextWindow
+trainingDataSize = 33929  # must be greater than 2*contextWindow
+hiddenLayer = (2)  # approx (2/3)*len(featureSet)*contextWindow
+binaryHiddenLayer = (2)
 windowSize = 400  # In number of frames
-windowHop = 160  # In number of frames
-languages = ["de", "it", "en"]
+windowHop = 100  # In number of frames
+languages = ["en", "de", "it"]
 test_epoch = 300
-contextWindowSize = 4  # -x/2 to +x/2 number of frames
+contextWindowSize = 5  # -x/2 to +x/2 number of frames
 maxTrainingSamples = 1210
 maxTestSamples = 1210
-trainingBatchSize = 7000000  # 78 features * 100 samples
-averageFramesPerSample = 1000000000000  # each clip treated as one sample by average out
-batch_size = 32
-nb_epoch = 20
+trainingBatchSize = 10000000000  # 78 features * 100 samples
+averageFramesPerSample = 30  # each clip treated as one sample by average out
+batch_size = 38
+binary_batch_size = 32
+nb_epoch = 26
+binary_nb_epoch = 20
 numberOfAverageStats = 2
 fixedAudioLength = 1.5  # seconds
-selFeatures = 30
+selFeatures = 25
+selBinaryFeatures = 25
 ####GMM Features
 gmmWindowSize = 400
 gmmWindowHop = 250
@@ -42,8 +46,8 @@ for i in range(9, 21):
     featureNumbers.append(i)
 for i in range(35, 47):
     featureNumbers.append(i)
-# for i in range(48, 60):
-#     featureNumbers.append(i)
+for i in range(48, 60):
+    featureNumbers.append(i)
 # for i in range(60, 62):
 #     featureNumbers.append(i)
 
@@ -113,6 +117,10 @@ def getHiddenLayer():
     return hiddenLayer
 
 
+def getBinaryHiddenLayer():
+    return binaryHiddenLayer
+
+
 def getTestEpoch():
     return test_epoch
 
@@ -125,8 +133,16 @@ def getBatchSize():
     return batch_size
 
 
+def getBinaryBatchSize():
+    return binary_batch_size
+
+
 def getNumberEpochs():
     return nb_epoch
+
+
+def getBinaryNumberEpochs():
+    return binary_nb_epoch
 
 
 def getNumberOfAverageStats():
