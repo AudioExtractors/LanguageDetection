@@ -6,10 +6,10 @@ import sys
 import Classify
 import psutil
 import os
+from binary_classify import BinaryClassify
 from feature_selection import FeatureSelection
 from feature_normalise import FeatureNormalise
 process = psutil.Process(os.getpid())
-
 
 class scoreModel:
     def __init__(self, languages, epoch):
@@ -19,13 +19,17 @@ class scoreModel:
         self.epoch = epoch
         # self.classifier = Classifier.Classifier(AppConfig.getHiddenLayer(), AppConfig.getEpoch())
         self.classifier = Classify.Classify()
+        self.bClassifiers = {}
+        for i in xrange(len(languages) - 1):
+            for j in xrange(i + 1, len(languages)):
+                self.bClassifiers[(languages[i], languages[j])] = BinaryClassify()
         self.inputFeatureVector = []  # Feature Vector
         self.inputClassVector = []  # ClassVector
         for i, language in enumerate(languages):
             self.label[language] = i
         #TODO: replace 78 with number of features and put 20 in appconfig as number of feture selected
         self.sel = FeatureSelection(AppConfig.getNumLanguages(), AppConfig.getNumFeatures() * AppConfig.getNumberOfAverageStats() *
-                      AppConfig.getContextWindowSize(), AppConfig.selFeatures)
+                      AppConfig.getContextWindowSize(), k=AppConfig.selFeatures)
         self.norm = FeatureNormalise(AppConfig.getNumFeatures() * AppConfig.getNumberOfAverageStats() *
                       AppConfig.getContextWindowSize())
 
@@ -51,20 +55,50 @@ class scoreModel:
         dumpSize = AudioIO.getFeatureDumpSize()
         # print "DumpSize: ", dumpSize
         for i in range(dumpSize):
-            combineDumpLanguageFeature = np.array([])
-            combineDumpLanguageLabel = np.array([])
+            combined_feature = np.array([])
+            combined_label = np.array([])
             for language in self.languages:
                 X = np.load("Dump//dumpX_"+language+str(i)+".npy")
-                Y = np.load("Dump//dumpY_"+language+str(i)+".npy")
-                if len(combineDumpLanguageFeature) == 0:
-                    combineDumpLanguageFeature = X
-                    combineDumpLanguageLabel = Y
+                y = np.load("Dump//dumpY_"+language+str(i)+".npy")
+                X = self.norm.transform(X)
+                if len(combined_feature) == 0:
+                    combined_feature = X
+                    combined_label = y
                 else:
-                    combineDumpLanguageFeature = np.vstack((combineDumpLanguageFeature, X))
-                    combineDumpLanguageLabel = np.concatenate((combineDumpLanguageLabel, Y))
-            X_norm = self.norm.transform(combineDumpLanguageFeature)
-            X = self.sel.transform(X_norm)
-            self.classifier.train(X, combineDumpLanguageLabel)
+                    combined_feature = np.vstack((combined_feature, X))
+                    combined_label = np.concatenate((combined_label, y))
+            # print combineDumpLanguageLabel
+            # print i, len(combineDumpLanguageFeature)
+            #X_norm = self.norm.transform(combined_feature)
+            X = self.sel.transform(combined_feature)
+            self.classifier.train(X, combined_label)
+
+    def bianryTrain(self):
+        dumpSize = AudioIO.getFeatureDumpSize()
+        combined_language_feature = {}
+        combined_language_label = {}
+        languages = self.languages
+        for language in languages:
+            combined_language_feature[language] = np.array([])
+            combined_language_label[language] = np.array([])
+            for i in range(dumpSize):
+                X = np.load("Dump//dumpX_"+language+str(i)+".npy")
+                y = np.load("Dump//dumpY_"+language+str(i)+".npy")
+                if len(combined_language_feature[language]) == 0:
+                    combined_language_feature[language] = X
+                    combined_language_label[language] = y
+                else:
+                    combined_language_feature[language] = np.vstack((combined_language_feature[language], X))
+                    combined_language_label[language] = np.concatenate((combined_language_label[language], y))
+            combined_language_feature[language] = self.norm.transform(combined_language_feature[language])
+        masks = np.load("Dump\\confusion_matrix.npy").item()
+        for i in xrange(len(languages) - 1):
+            for j in xrange(i + 1, len(languages)):
+                X_combined = np.vstack((combined_language_feature[languages[i]], combined_language_feature[languages[j]]))
+                y_combined = np.concatenate((combined_language_label[languages[i]], combined_language_label[languages[j]]))
+                print "Training for: ",(languages[i], languages[j])
+                X_combined = X_combined[:, masks[(languages[i], languages[j])]]
+                self.bClassifiers[(languages[i], languages[j])].train(X_combined,y_combined)
 
     def createAudioDumps(self):
         for language in self.languages:
@@ -207,15 +241,16 @@ class scoreModel:
 # a = datetime.datetime.now()
 X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
 # X.populateFeatureVector()
-# X.createAudioDumps()
-files = X.dumpFeatureVector()
+#X.createAudioDumps()
+#files = X.dumpFeatureVector()
 # print "Files",files
 # print AppConfig.getNumFeatures()*AppConfig.
 X.normFeature()
 X.selectFeature()
 X.train()
-# X.saveNN("NN")
+X.saveNN("NN")
 # X.loadNN("NN")
+X.bianryTrain()
 # X.selectFeature()
 # b = datetime.datetime.now()
 # c = b-a

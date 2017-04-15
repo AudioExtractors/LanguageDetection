@@ -29,6 +29,7 @@ class BinaryClassify:
 
     def train(self, X, Y):
         output = LabelBinarizer().fit(range(2)).transform(Y)
+        output = numpy.append(1 - output, output, axis=1)
         X, output = shuffle(X, output, random_state=10)
         self.model.fit(X, output, batch_size=AppConfig.getBinaryBatchSize(),
                                  nb_epoch=AppConfig.getBinaryNumberEpochs())
