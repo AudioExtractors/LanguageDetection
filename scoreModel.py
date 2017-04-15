@@ -62,8 +62,6 @@ class scoreModel:
                 else:
                     combineDumpLanguageFeature = np.vstack((combineDumpLanguageFeature, X))
                     combineDumpLanguageLabel = np.concatenate((combineDumpLanguageLabel, Y))
-            # print combineDumpLanguageLabel
-            # print i, len(combineDumpLanguageFeature)
             X_norm = self.norm.transform(combineDumpLanguageFeature)
             X = self.sel.transform(X_norm)
             self.classifier.train(X, combineDumpLanguageLabel)

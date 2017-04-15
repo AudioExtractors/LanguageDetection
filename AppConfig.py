@@ -1,23 +1,23 @@
 import os
-trainingDataSize = 33929  # must be greater than 2*contextWindow
-hiddenLayer = (2)  # approx (2/3)*len(featureSet)*contextWindow
+trainingDataSize = 2419  # must be greater than 2*contextWindow
+hiddenLayer = (11)  # approx (2/3)*len(featureSet)*contextWindow
 binaryHiddenLayer = (2)
-windowSize = 400  # In number of frames
-windowHop = 100  # In number of frames
-languages = ["en", "de", "it"]
+windowSize = 600  # In number of frames
+windowHop = 200  # In number of frames
+languages = ["ch", "fr", "ru"]
 test_epoch = 300
 contextWindowSize = 5  # -x/2 to +x/2 number of frames
 maxTrainingSamples = 1210
 maxTestSamples = 1210
-trainingBatchSize = 10000000000  # 78 features * 100 samples
-averageFramesPerSample = 30  # each clip treated as one sample by average out
+trainingBatchSize = 1000000000000  # 78 features * 100 samples
+averageFramesPerSample = 2  # each clip treated as one sample by average out
 batch_size = 38
 binary_batch_size = 32
 nb_epoch = 26
 binary_nb_epoch = 20
 numberOfAverageStats = 2
-fixedAudioLength = 1.5  # seconds
-selFeatures = 25
+fixedAudioLength = 0.0  # seconds
+selFeatures = 30
 selBinaryFeatures = 25
 ####GMM Features
 gmmWindowSize = 400

@@ -55,7 +55,7 @@ class FeatureSelection:
         Call function batchData to train on data.
         After whole data is received call fit and transform
     """
-    def __init__(self, n_classes, n_features, labels=-1, k=10):
+    def __init__(self, n_classes, n_features, k=10, labels=-1):
         self.count_ = 0
         self.k = k
         self.observed = np.zeros((n_classes, n_features), dtype=np.float64)

@@ -28,7 +28,7 @@ class Classify:
             # self.model.add(Dropout(0.2))
             # self.model.add(BatchNormalization())
             for num in range(1, len(hidden_layers)):
-                self.model.add(Dense(hidden_layers[num], activation='sigmoid'))
+                self.model.add(Dense(hidden_layers[num], activity_regularizer=activity_l2(), activation='sigmoid'))
                 # self.model.add(Dropout(0.1))
                 # self.model.add(BatchNormalization())
         else:
@@ -40,7 +40,7 @@ class Classify:
                       activation='sigmoid'))
             # self.model.add(BatchNormalization())
         # self.model.add(Dense(2, activation='sigmoid'))
-        self.model.add(Dense(AppConfig.getNumLanguages(), activation='sigmoid'))
+        self.model.add(Dense(AppConfig.getNumLanguages(), activity_regularizer=activity_l2(), activation='softmax'))
         # self.model.add(BatchNormalization())
         self.model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'])  # adam gave
         # better results, but adadelta used everywhere
