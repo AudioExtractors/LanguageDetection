@@ -169,7 +169,11 @@ class scoreModel:
     def predict(self, audio):
         featureVector = audio.getAverageFeatureVector(std=True)
         normFeatureVector = self.norm.transform(featureVector)
-        return self.classifier.predict(self.sel.transform(normFeatureVector))
+        subcandidates = self.classifier.predict(self.sel.transform(normFeatureVector))
+        language1 = self.languages[subcandidates[0][1]]
+        language2 = self.languages[subcandidates[1][1]]
+        masks = np.load("Dump\\confusion_matrix.npy").item()
+        return self.bClassifiers[(language1,language2)].predict(normFeatureVector[:, masks[(language1, language2)]])
 
     def analyse(self):
         """
@@ -241,8 +245,8 @@ class scoreModel:
 # a = datetime.datetime.now()
 X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
 # X.populateFeatureVector()
-#X.createAudioDumps()
-#files = X.dumpFeatureVector()
+X.createAudioDumps()
+files = X.dumpFeatureVector()
 # print "Files",files
 # print AppConfig.getNumFeatures()*AppConfig.
 X.normFeature()
