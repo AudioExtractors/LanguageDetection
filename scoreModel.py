@@ -172,6 +172,8 @@ class scoreModel:
         subcandidates = self.classifier.predict(self.sel.transform(normFeatureVector))
         language1 = self.languages[subcandidates[0][1]]
         language2 = self.languages[subcandidates[1][1]]
+        if subcandidates[0][1] > subcandidates[1][1]:
+            language1, language2 = language2, language1
         masks = np.load("Dump\\confusion_matrix.npy").item()
         return self.bClassifiers[(language1,language2)].predict(normFeatureVector[:, masks[(language1, language2)]])
 
