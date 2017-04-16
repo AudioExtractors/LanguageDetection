@@ -13,7 +13,6 @@ process = psutil.Process(os.getpid())
 
 class scoreModel:
     def __init__(self, languages, epoch):
-        self.label = dict()
         self.languages = languages
         # self.featureSets = featureSets
         self.epoch = epoch
@@ -25,8 +24,6 @@ class scoreModel:
                 self.bClassifiers[(languages[i], languages[j])] = BinaryClassify(labels=[i,j])
         self.inputFeatureVector = []  # Feature Vector
         self.inputClassVector = []  # ClassVector
-        for i, language in enumerate(languages):
-            self.label[language] = i
         #TODO: replace 78 with number of features and put 20 in appconfig as number of feture selected
         self.sel = FeatureSelection(AppConfig.getNumLanguages(), AppConfig.getNumFeatures() * AppConfig.getNumberOfAverageStats() *
                       AppConfig.getContextWindowSize(), k=AppConfig.selFeatures)
@@ -153,7 +150,7 @@ class scoreModel:
                         Y = []
                     currentDumpSize += featuresPerFrame
                     X.append(frameFeature)
-                    Y.append(self.label.get(language))
+                    Y.append(self.languages.index(language))
                     inputSize += 1
                 if flag == 1:
                     break
@@ -206,7 +203,7 @@ class scoreModel:
                 subcandidates = self.predict(sample)
                 key=(language,self.languages[subcandidates[0][1]])
                 confusionMatrix[key] += 1
-                if subcandidates[0][1] == self.label[language]:
+                if self.languages[subcandidates[0][1]] == language:
                     success += 1
                     log.write("[Correct]"+sample.getIndex()+" "+str(subcandidates)+"\n")
                 else:
