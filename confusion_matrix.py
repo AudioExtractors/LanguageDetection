@@ -29,7 +29,7 @@ if __name__ == "__main__":
         for j in xrange(i+1,len(languages)):
             print languages[i],languages[j]
             sel = FeatureSelection(2, AppConfig.getNumFeatures() * AppConfig.getNumberOfAverageStats() *
-                                  AppConfig.getContextWindowSize(), labels=[i,j], k=AppConfig.selFeatures)
+                                  AppConfig.getContextWindowSize(), labels=[i,j], k=AppConfig.selBinaryFeatures)
             selF(sel,norm,languages[i],dumpSize)
             selF(sel,norm,languages[j],dumpSize)
             sel.fit()

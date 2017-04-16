@@ -73,7 +73,7 @@ class scoreModel:
             X = self.sel.transform(combined_feature)
             self.classifier.train(X, combined_label)
 
-    def bianryTrain(self):
+    def binaryTrain(self):
         dumpSize = AudioIO.getFeatureDumpSize()
         combined_language_feature = {}
         combined_language_label = {}
@@ -245,16 +245,16 @@ class scoreModel:
 # a = datetime.datetime.now()
 X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
 # X.populateFeatureVector()
-X.createAudioDumps()
-files = X.dumpFeatureVector()
+# X.createAudioDumps()
+# files = X.dumpFeatureVector()
 # print "Files",files
 # print AppConfig.getNumFeatures()*AppConfig.
 X.normFeature()
 X.selectFeature()
 X.train()
-X.saveNN("NN")
+# X.saveNN("NN")
 # X.loadNN("NN")
-X.bianryTrain()
+X.binaryTrain()
 # X.selectFeature()
 # b = datetime.datetime.now()
 # c = b-a
