@@ -12,7 +12,7 @@ import AppConfig
 
 
 class BinaryClassify:
-    def __init__(self):
+    def __init__(self, labels=-1):
         hidden_layers = AppConfig.getBinaryHiddenLayer()
         self.model = Sequential()
         if isinstance(hidden_layers, (collections.Sequence, numpy.ndarray)):
@@ -26,9 +26,12 @@ class BinaryClassify:
             # self.model.add(Dropout(0.2))
         self.model.add(Dense(2, activation='softmax'))
         self.model.compile(optimizer='adadelta', loss='binary_crossentropy', metrics=['accuracy'])
+        if labels==-1:
+            labels = range(2)
+        self.label = LabelBinarizer().fit(labels)
 
     def train(self, X, Y):
-        output = LabelBinarizer().fit(range(2)).transform(Y)
+        output = self.label.transform(Y)
         output = numpy.append(1 - output, output, axis=1)
         X, output = shuffle(X, output, random_state=10)
         self.model.fit(X, output, batch_size=AppConfig.getBinaryBatchSize(),

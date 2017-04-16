@@ -22,7 +22,7 @@ class scoreModel:
         self.bClassifiers = {}
         for i in xrange(len(languages) - 1):
             for j in xrange(i + 1, len(languages)):
-                self.bClassifiers[(languages[i], languages[j])] = BinaryClassify()
+                self.bClassifiers[(languages[i], languages[j])] = BinaryClassify(labels=[i,j])
         self.inputFeatureVector = []  # Feature Vector
         self.inputClassVector = []  # ClassVector
         for i, language in enumerate(languages):
