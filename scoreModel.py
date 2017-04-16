@@ -119,7 +119,6 @@ class scoreModel:
             samples = AudioIO.getDumpTrainingSample(language)
             # print "current memory usage : ", (process.memory_info().rss)/(1024*1024)
             ct = 0
-            gt = 0
             for sample in samples:
                 # if ct % 100 == 0:
                 #     print inputSize
@@ -172,7 +171,11 @@ class scoreModel:
         if subcandidates[0][1] > subcandidates[1][1]:
             language1, language2 = language2, language1
         masks = np.load("Dump\\confusion_matrix.npy").item()
-        return self.bClassifiers[(language1,language2)].predict(normFeatureVector[:, masks[(language1, language2)]])
+        finalcandidates = self.bClassifiers[(language1,language2)].predict(normFeatureVector[:, masks[(language1, language2)]])
+        finalcandidates.append(subcandidates[2])
+        if finalcandidates[0][1]+finalcandidates[1][1]+finalcandidates[2][1] != 3:
+            raise ValueError("Unexpected Output Candidates", finalcandidates)
+        return finalcandidates
 
     def analyse(self):
         """
@@ -194,6 +197,7 @@ class scoreModel:
             log.write("Testing for samples in "+language+"\n")
             Total = AppConfig.getTestEpoch()
             success = 0
+            completefailure = 0
             total=0
             print language
             samples = AudioIO.getDumpTestSample(language)
@@ -207,14 +211,17 @@ class scoreModel:
                     success += 1
                     log.write("[Correct]"+sample.getIndex()+" "+str(subcandidates)+"\n")
                 else:
+                    if self.languages[subcandidates[2][1]] == language:
+                        completefailure += 1
                     log.write("[Wrong]"+sample.getIndex()+" "+str(subcandidates)+"\n")
 #                except:
 #                    print "fail"
 #                    continue
             totalCount[language] = total
             analysis.append((language, float(success*100)/Total))
+            analysis.append((language, 100.0 - float(completefailure * 100) / Total))
 
-        print confusionMatrix
+        #print confusionMatrix
         sys.stdout.write("     ")
         for language in self.languages:
             print language+"   ",
@@ -250,9 +257,9 @@ X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
 # print AppConfig.getNumFeatures()*AppConfig.
 X.normFeature()
 X.selectFeature()
-X.train()
+# X.train()
 # X.saveNN("NN")
-# X.loadNN("NN")
+X.loadNN("NN")
 X.binaryTrain()
 # X.selectFeature()
 # b = datetime.datetime.now()
