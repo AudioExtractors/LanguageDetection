@@ -28,6 +28,7 @@ class BinaryClassify:
         self.model.compile(optimizer='adadelta', loss='binary_crossentropy', metrics=['accuracy'])
         if labels==-1:
             labels = range(2)
+        self.index = labels
         self.label = LabelBinarizer().fit(labels)
 
     def train(self, X, Y):
@@ -50,7 +51,7 @@ class BinaryClassify:
                     probability[lang] = predictions[lang]
         subCandidates = []
         for key in probability:
-            tp = ((probability[key] / total), key)
+            tp = ((probability[key] / total), self.index[key])
             subCandidates.append(tp)
         subCandidates.sort()
         subCandidates.reverse()
