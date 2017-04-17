@@ -6,6 +6,7 @@ import sys
 import Classify
 import psutil
 import os
+import confusion_matrix
 from binary_classify import BinaryClassify
 from feature_selection import FeatureSelection
 from feature_normalise import FeatureNormalise
@@ -252,14 +253,15 @@ class scoreModel:
 X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
 # X.populateFeatureVector()
 # X.createAudioDumps()
-# files = X.dumpFeatureVector()
+#files = X.dumpFeatureVector()
 # print "Files",files
 # print AppConfig.getNumFeatures()*AppConfig.
+confusion_matrix.dumpConfusionMatrix()
 X.normFeature()
 X.selectFeature()
-# X.train()
-# X.saveNN("NN")
-X.loadNN("NN")
+X.train()
+X.saveNN("NN")
+# X.loadNN("NN")
 X.binaryTrain()
 # X.selectFeature()
 # b = datetime.datetime.now()

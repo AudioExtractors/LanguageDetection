@@ -20,7 +20,7 @@ def selF(sel, norm, lang, dumpSize):
         sel.batchData(norm.transform(X), y)
 
 # Create confusion matrix dump
-if __name__ == "__main__":
+def dumpConfusionMatrix():
     dumpSize = AudioIO.getFeatureDumpSize()
     masks = {}
     languages = AppConfig.languages
@@ -39,5 +39,6 @@ if __name__ == "__main__":
     np.save("Dump\\confusion_matrix", masks)
     #print masks
            
-           
+if __name__ == "__main__":
+    dumpConfusionMatrix()
            
