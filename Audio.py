@@ -72,15 +72,9 @@ class Audio:
         Deltas2 = numpy.transpose(Deltas2)
         featureVector = []
 
-        # start = 0
         for frames in range(0, len(featureVectorTemp)):
             Temp = numpy.append(featureVectorTemp[frames], Deltas[frames])
             Temp = numpy.append(Temp, Deltas2[frames])
-            # end = start + AppConfig.getWindowSize()
-            # if end >= len(self.signal):
-            #    end = len(self.signal) - 1
-            # Temp = numpy.append(Temp, formants.getFormants(self.fs, self.signal[start:end]))
-            # start += AppConfig.getWindowHop()
             featureVector.append(Temp)
 
         featureVector = numpy.array(featureVector)
@@ -130,7 +124,6 @@ class Audio:
     def makeAverageWindows(self, languageFeature, averageFramesPerSample, std=False):
         averageFeature = []
         noOfFrames = len(languageFeature)
-        #averagingWindowSize=averageFramesPerSample
         averagingWindowSize = max(1, noOfFrames/averageFramesPerSample)
         start = 0
         end = averagingWindowSize
@@ -145,7 +138,7 @@ class Audio:
 
             averageFeature.append(averagingWindow)
             start = end
-            if start+2*averagingWindowSize > noOfFrames:
+            if start + 2 * averagingWindowSize > noOfFrames:
                 end = noOfFrames
             else:
                 end = start + averagingWindowSize
@@ -155,18 +148,6 @@ class Audio:
     def getNoOfFrames(self):
         return self.noFrames
 
-    def publish(self,dir):
+    def publish(self, dir):
         path = os.path.join(dir, self.language, self.name)
         np.save(path, self.signal)
-        # print "Saving..",path,self.signal[0:60]
-
-"""G=Audio(AppConfig.getFilePathTraining("en",20))
-print G.getNoOfFrames()
-print float(G.getNoOfFrames())/16000
-#G.publish()
-
-sig=np.load(os.path.join("Samples",G.language,G.name+".npy"))
-print (G.signal==sig).all()
-
-x=np.array([[1,2,3],[2,3,4],[10,18,17],[100,2,3],[1,6,7]])
-print G.makeAverageWindows(x,2)"""
