@@ -1,8 +1,9 @@
 import numpy as np
 from scipy import special
-from sklearn.feature_selection import SelectKBest
-from sklearn.feature_selection import chi2
+# from sklearn.feature_selection import SelectKBest
+# from sklearn.feature_selection import chi2
 from sklearn.preprocessing import LabelBinarizer
+
 
 def _clean_nans(scores):
     """
@@ -11,6 +12,7 @@ def _clean_nans(scores):
     """
     scores[np.isnan(scores)] = np.finfo(scores.dtype).min
     return scores
+
 
 def safe_mask(X, mask):
     """Return a mask which is safe to use on X.
@@ -36,6 +38,7 @@ def safe_mask(X, mask):
         mask = ind[mask]
     return mask
 
+
 def _chisquare(f_obs, f_exp):
         f_obs = np.asarray(f_obs, dtype=np.float64)
         k = len(f_obs)
@@ -46,6 +49,7 @@ def _chisquare(f_obs, f_exp):
             chisq /= f_exp
         chisq = chisq.sum(axis=0)
         return chisq, special.chdtrc(k - 1, chisq)
+
 
 class FeatureSelection:
     """Select features according to the k highest scores.
@@ -61,21 +65,21 @@ class FeatureSelection:
         self.observed = np.zeros((n_classes, n_features), dtype=np.float64)
         self.feature_count = np.zeros((1, n_features), dtype=np.float64)
         self.class_prob = np.zeros((1, n_classes), dtype=np.float64)
-        if labels==-1:
+        if labels == -1:
             labels = range(n_classes)
-        self.label = LabelBinarizer().fit( labels )
+        self.label = LabelBinarizer().fit(labels)
         self.scores_ = np.zeros(n_features, dtype=np.float64)
         self.pvalues_ = np.zeros(n_features, dtype=np.float64)
         self.mask = np.zeros(n_features, dtype=bool)
 
     def batchData(self, X, y):
-        X = X + 15  #to make each value positive
-        if np.any( X < 0):
+        X = X + 15  # to make each value positive
+        if np.any(X < 0):
             raise ValueError("Input X must be non-negative.")
         Y = self.label.transform(y)
         if Y.shape[1] == 1:
             Y = np.append(1 - Y, Y, axis=1)
-        self.observed = self.observed + np.dot(Y.T, X) # n_classes * n_features
+        self.observed = self.observed + np.dot(Y.T, X)  # n_classes * n_features
         self.feature_count = self.feature_count + X.sum(axis=0).reshape(1, -1)
         self.class_prob = self.class_prob + Y.sum(axis=0).reshape(1, -1)
         self.count_ = self.count_ + X.shape[0]
@@ -91,31 +95,31 @@ class FeatureSelection:
         return X[:, safe_mask(X, self.mask)]
         
         
-#Tester
-if __name__ == "__main__":
-    b=2
-    X = np.array([ [1,1,1,1], [2,2,2,2], [1,1,3,3], [2,2,3,4] ])
-    y = np.array( [0,2,2,0] )
-    Y = LabelBinarizer().fit_transform(y)
-    if Y.shape[1] == 1:
-        Y = np.append(1 - Y, Y, axis=1)
-    df = Y.shape[1]-1
-    X1, y1 = X[:b], y[:b]
-    X2, y2 = X[b:], y[b:]
-    print X
-    print "----using whole data------"
-    sel = SelectKBest(chi2, k=2)
-    sel = sel.fit(X,y)
-    print sel.pvalues_
-    print sel.scores_
-    X_new = sel.transform(X)
-    print X_new
-    print "------with batch data------"
-    f = FeatureSelection(Y.shape[1],X.shape[1],labels=[0,2],k=2)
-    f.batchData(X1,y1)
-    f.batchData(X2,y2)
-    f.fit()
-    print f.pvalues_
-    print f.scores_
-    X_b = f.transform(X)
-    print X_b
+# Tester
+# if __name__ == "__main__":
+#     b = 2
+#     X = np.array([[1, 1, 1, 1], [2, 2, 2, 2], [1, 1, 3, 3], [2, 2, 3, 4]])
+#     y = np.array([0, 2, 2, 0])
+#     Y = LabelBinarizer().fit_transform(y)
+#     if Y.shape[1] == 1:
+#         Y = np.append(1 - Y, Y, axis=1)
+#     df = Y.shape[1]-1
+#     X1, y1 = X[:b], y[:b]
+#     X2, y2 = X[b:], y[b:]
+#     print X
+#     print "----using whole data------"
+#     sel = SelectKBest(chi2, k=2)
+#     sel = sel.fit(X, y)
+#     print sel.pvalues_
+#     print sel.scores_
+#     X_new = sel.transform(X)
+#     print X_new
+#     print "------with batch data------"
+#     f = FeatureSelection(Y.shape[1], X.shape[1], labels=[0, 2], k=2)
+#     f.batchData(X1, y1)
+#     f.batchData(X2, y2)
+#     f.fit()
+#     print f.pvalues_
+#     print f.scores_
+#     X_b = f.transform(X)
+#     print X_b

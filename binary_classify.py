@@ -2,7 +2,7 @@ import numpy
 numpy.random.seed(1337)
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
-from keras.regularizers import activity_l2, activity_l1l2
+# from keras.regularizers import activity_l2, activity_l1l2
 from keras.models import load_model
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.utils import shuffle
