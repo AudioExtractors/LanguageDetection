@@ -43,6 +43,7 @@ dump_test_dir = "TestDump"
 dump_base_dir = "Dump"
 logs_base_dir = "logs"
 gmmLogs_base_dir = os.path.join(logs_base_dir, "gmm")
+NN_save_dir = "NNFiles"
 
 # Initial NN Characteristics
 hiddenLayer = (11)  # approx (2/3) * len(featureSet) * contextWindow

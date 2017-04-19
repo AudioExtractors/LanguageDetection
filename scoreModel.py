@@ -168,7 +168,7 @@ class scoreModel:
         return finalcandidates
 
     def analyse(self):
-        fileName = os.path.join(AppConfig.logs_base_dir, "Log"+str(datetime.datetime.now().strftime("%m%d-%H-%M-%S")))
+        fileName = os.path.join(AppConfig.logs_base_dir, "Log" + str(datetime.datetime.now().strftime("%m%d-%H-%M-%S")))
         log = open(fileName+".txt", 'w')
         confusionMatrix = {}
         for language in self.languages:
@@ -223,19 +223,32 @@ class scoreModel:
         return analysis
 
     def saveNN(self, name):
-        self.classifier.save(name)
+        self.classifier.save(os.path.join(AppConfig.NN_save_dir, name))
 
     def loadNN(self, name):
-        self.classifier.load(name)
+        self.classifier.load(os.path.join(AppConfig.NN_save_dir, name))
 
-X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
-# X.createAudioDumps()
-files = X.dumpFeatureVector()
-confusion_matrix.dumpConfusionMatrix()
-X.normFeature()
-X.selectFeature()
-X.train()
-# X.saveNN("NN")
-# X.loadNN("NN")
-X.binaryTrain()
-print X.analyse()
+    def saveBinaryNN(self, name):
+        for i in xrange(len(self.languages) - 1):
+            for j in xrange(i + 1, len(self.languages)):
+                self.bClassifiers[(self.languages[i], self.languages[j])].save(os.path.join(AppConfig.NN_save_dir, name
+                                                                                            + str(i) + str(j)))
+
+    def loadBinaryNN(self, name):
+        for i in xrange(len(self.languages) - 1):
+            for j in xrange(i + 1, len(self.languages)):
+                self.bClassifiers[(self.languages[i], self.languages[j])].load(os.path.join(AppConfig.NN_save_dir, name
+                                                                                            + str(i) + str(j)))
+
+if __name__ == "__main__":
+    X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
+    # X.createAudioDumps()
+    # files = X.dumpFeatureVector()
+    # confusion_matrix.dumpConfusionMatrix()
+    X.normFeature()
+    X.selectFeature()
+    X.train()
+    # X.saveNN("NN")
+    # X.loadNN("NN")
+    X.binaryTrain()
+    print X.analyse()
