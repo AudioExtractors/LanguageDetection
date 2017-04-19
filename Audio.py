@@ -61,8 +61,8 @@ class Audio:
         Deltas = []
         Deltas2 = []
         for mfcc in range(8, 21):
-            delta = librosa.feature.delta(featureVectorTemp[mfcc],width=3)
-            delta2 = librosa.feature.delta(featureVectorTemp[mfcc],width=3, order=2)
+            delta = librosa.feature.delta(featureVectorTemp[mfcc], width=3)
+            delta2 = librosa.feature.delta(featureVectorTemp[mfcc], width=3, order=2)
             Deltas.append(delta)
             Deltas2.append(delta2)
         Deltas = numpy.array(Deltas)
@@ -110,14 +110,14 @@ class Audio:
     def getAverageFeatureVector(self, std=False):  # std true means standard deviation to be included as well
         featureVector = self.getFeatureVector()
         featureVector = self.makeContextWindows(featureVector)
-        if featureVector.size==0:
+        if featureVector.size == 0:
             return featureVector
         averageFeatureVector = self.makeAverageWindows(featureVector, AppConfig.averageFramesPerSample)
         if std == True:
             stdFeatureVector = self.makeAverageWindows(featureVector, AppConfig.averageFramesPerSample, std=True)
             if averageFeatureVector.shape != stdFeatureVector.shape:
                 print "Average Features cannot be concatenated because of shape error"
-                print stdFeatureVector.shape,averageFeatureVector.shape
+                print stdFeatureVector.shape, averageFeatureVector.shape
             averageFeatureVector = np.concatenate((averageFeatureVector, stdFeatureVector), axis=1)
         return averageFeatureVector
 
