@@ -60,7 +60,7 @@ class Audio:
                                                                        AppConfig.getWindowHop())
         Deltas = []
         Deltas2 = []
-        for mfcc in range(8, 21):
+        for mfcc in range(0, 13):
             delta = librosa.feature.delta(featureVectorTemp[mfcc], width=3)
             delta2 = librosa.feature.delta(featureVectorTemp[mfcc], width=3, order=2)
             Deltas.append(delta)

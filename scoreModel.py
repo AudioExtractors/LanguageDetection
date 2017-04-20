@@ -40,7 +40,7 @@ class scoreModel:
 
     def dumpFeatureVector(self):
         underFetching = True
-        noOfFilesTrained = []
+        # noOfFilesTrained = []
         for language in self.languages:
             X = []
             Y = []
@@ -64,7 +64,7 @@ class scoreModel:
                         print "Created dump:-"+str(dumpLength)
                         np.save("Dump\\dumpX_" + language + str(dumpLength), X)
                         np.save("Dump\\dumpY_" + language + str(dumpLength), Y)
-                        noOfFilesTrained.append((language, sample.getIndex()))
+                        # noOfFilesTrained.append((language, sample.getIndex()))
                         flag = 1
                         break
                     if currentDumpSize + featuresPerFrame > AppConfig.trainingBatchSize:
@@ -85,7 +85,7 @@ class scoreModel:
                 print "Under Fetched Data Samples expected", self.epoch, "received", inputSize
             else:
                 print "Fetched Data Samples expected", inputSize, "and ", ct, "number of files have been dumped"
-        return noOfFilesTrained
+        # return noOfFilesTrained
 
     def normFeature(self):
         dumpSize = AudioIO.getFeatureDumpSize()
@@ -243,8 +243,8 @@ class scoreModel:
 if __name__ == "__main__":
     X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
     # X.createAudioDumps()
-    # files = X.dumpFeatureVector()
-    # confusion_matrix.dumpConfusionMatrix()
+    X.dumpFeatureVector()
+    confusion_matrix.dumpConfusionMatrix()
     X.normFeature()
     X.selectFeature()
     X.train()
