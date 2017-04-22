@@ -162,8 +162,12 @@ class scoreModel:
         masks = np.load("Dump\\confusion_matrix.npy").item()
         finalcandidates = self.bClassifiers[(language1, language2)].predict(normFeatureVector[:, masks[(language1,
                                                                                                        language2)]])
-        finalcandidates.append(subcandidates[2])
-        if finalcandidates[0][1]+finalcandidates[1][1]+finalcandidates[2][1] != 3:
+        label_sum = subcandidates[0][1] + subcandidates[1][1]
+        total_label = len(self.languages)
+        for i in xrange(2,total_label):
+            finalcandidates = finalcandidates.append(subcandidates[i])
+            label_sum += subcandidates[i][1]
+        if label_sum != ( total_label*(total_label-1) )/2:
             raise ValueError("Unexpected Output Candidates", finalcandidates)
         return finalcandidates
 
