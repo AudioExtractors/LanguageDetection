@@ -50,6 +50,7 @@ class scoreModel:
             inputSize = 0
             flag = 0
             samples = AudioIO.getDumpTrainingSample(language)
+            print "Done"
             ct = 0
             for sample in samples:
                 ct += 1
@@ -165,15 +166,27 @@ class scoreModel:
         label_sum = subcandidates[0][1] + subcandidates[1][1]
         total_label = len(self.languages)
         for i in xrange(2, total_label):
-            finalcandidates = finalcandidates.append(subcandidates[i])
+            finalcandidates.append(subcandidates[i])
             label_sum += subcandidates[i][1]
         if label_sum != (total_label*(total_label-1))/2:
             raise ValueError("Unexpected Output Candidates", finalcandidates)
         return finalcandidates
 
     def analyse(self):
+        ##LOGGING
         fileName = os.path.join(AppConfig.logs_base_dir, "Log" + str(datetime.datetime.now().strftime("%m%d-%H-%M-%S")))
         log = open(fileName+".txt", 'w')
+        log.write("windowSize             :"+str(AppConfig.windowSize) + "\n")
+        log.write("windowHop              :"+str(AppConfig.windowHop )+ "\n")
+        log.write("contextWindowSize      :"+str(AppConfig.contextWindowSize )+ "\n")
+        log.write("averageFramesPerSample :"+str(AppConfig.averageFramesPerSample )+ "\n")
+        log.write("includeStd             :"+str(AppConfig.includeStd )+ "\n")
+        log.write("hiddenLayer            :"+str(AppConfig.hiddenLayer )+ "\n")
+        log.write("batch_size             :"+str(AppConfig.batch_size )+ "\n")
+        log.write("nb_epoch               :"+str(AppConfig.batch_size )+ "\n")
+        log.write("selFeatures            :"+str(AppConfig.batch_size )+ "\n")
+        ##LOGGING END
+
         confusionMatrix = {}
         for language in self.languages:
             for language2 in self.languages:
@@ -216,13 +229,17 @@ class scoreModel:
                 print "%d" % confusionMatrix[(language, language2)]+"   ",
         print "\n"
 
+        ##LOGGING
         log.write("Confusion Matrix on number of Samples:")
         log.write(str(confusionMatrix) + "\n" + "\n")
         for language in self.languages:
                 for language2 in self.languages:
                     confusionMatrix[(language, language2)] /= float(totalCount[language])
         log.write("Confusion Matrix on Percentage of Samples:")
-        log.write(str(confusionMatrix))
+        log.write(str(confusionMatrix) + "\n" + "\n")
+        log.write("Final Analysis"+ "\n" + "\n")
+        log.write(str(analysis))
+
         print "See logs in -", fileName
         return analysis
 

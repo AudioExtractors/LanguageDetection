@@ -22,7 +22,7 @@ windowHop = 100  # In number of frames
 contextWindowSize = 5  # -x/2 to +x/2 number of frames
 averageFramesPerSample = 3  # each clip treated as one sample by average out
 includeStd = False
-if includeStd:
+if includeStd == True:
     numberOfAverageStats = 2
 else:
     numberOfAverageStats = 1
@@ -32,8 +32,8 @@ fixedAudioLength = 0.0  # In seconds
 trainingDataSize = 1183
 test_epoch = 253
 trainingBatchSize = 1000000000000
-maxTrainingSamples = 1200
-maxTestSamples = 300
+maxTrainingSamples = 1183
+maxTestSamples = 253
 
 # Directories
 base_dir = "Data"

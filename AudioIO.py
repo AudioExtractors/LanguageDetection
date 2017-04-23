@@ -65,23 +65,29 @@ def dumpTestFiles(language):
 
 def getDumpTrainingSample(language):
     samples = []
+
     for files in os.walk(os.path.join(AppConfig.dump_train_dir, language)):
         for file in files[2]:
             path = os.path.join(str(files[0]), file)
             sig = np.load(path)
             audio = Audio.Audio(path, sig)
             samples.append(audio)
+
     return samples
 
 
 def getDumpTestSample(language):
     samples = []
+    ct=0
     for files in os.walk(os.path.join(AppConfig.dump_test_dir, language)):
         for file in files[2]:
             path = os.path.join(str(files[0]), file)
             sig = np.load(path)
             audio = Audio.Audio(path, sig)
             samples.append(audio)
+            ct+=1
+            if ct==AppConfig.getTestEpoch():
+                break
     return samples
 
 
