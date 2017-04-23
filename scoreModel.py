@@ -165,7 +165,7 @@ class scoreModel:
         label_sum = subcandidates[0][1] + subcandidates[1][1]
         total_label = len(self.languages)
         for i in xrange(2, total_label):
-            finalcandidates = finalcandidates.append(subcandidates[i])
+            finalcandidates.append(subcandidates[i])
             label_sum += subcandidates[i][1]
         if label_sum != (total_label*(total_label-1))/2:
             raise ValueError("Unexpected Output Candidates", finalcandidates)
