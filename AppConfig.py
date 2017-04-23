@@ -11,24 +11,28 @@ featureNames = ["MFCC 1", "MFCC 2", "MFCC 3", "MFCC 4", "MFCC 5", "MFCC 6", "MFC
                 "MFCC Delta Delta 7", "MFCC Delta Delta 8", "MFCC Delta Delta 9", "MFCC Delta Delta 10",
                 "MFCC Delta Delta 11", "MFCC Delta Delta 12", "MFCC Delta Delta 13"]
 featureNumbers = []
-for i in range(1, 13):
+for i in range(0, 13):
     featureNumbers.append(i)
-for i in range(14, 26):
+for i in range(13, 26):
     featureNumbers.append(i)
-for i in range(27, 39):
+for i in range(26, 39):
     featureNumbers.append(i)
 windowSize = 400  # In number of frames
 windowHop = 100  # In number of frames
 contextWindowSize = 5  # -x/2 to +x/2 number of frames
-averageFramesPerSample = 1  # each clip treated as one sample by average out
-numberOfAverageStats = 2
+averageFramesPerSample = 3  # each clip treated as one sample by average out
+includeStd = False
+if includeStd:
+    numberOfAverageStats = 2
+else:
+    numberOfAverageStats = 1
 fixedAudioLength = 0.0  # In seconds
 
 # Data Size
-trainingDataSize = 1209
-test_epoch = 300
+trainingDataSize = 1183
+test_epoch = 253
 trainingBatchSize = 1000000000000
-maxTrainingSamples = 1210
+maxTrainingSamples = 1200
 maxTestSamples = 300
 
 # Directories
@@ -42,10 +46,10 @@ gmmLogs_base_dir = os.path.join(logs_base_dir, "gmm")
 NN_save_dir = "NNFiles"
 
 # Initial NN Characteristics
-hiddenLayer = (11)  # approx (2/3) * len(featureSet) * contextWindow
+hiddenLayer = (18, 9, 5)  # approx (2/3) * len(featureSet) * contextWindow
 batch_size = 38
-nb_epoch = 26
-selFeatures = 30
+nb_epoch = 30
+selFeatures = 39
 
 # Binary NN Characteristics
 binaryHiddenLayer = (10, 7)
