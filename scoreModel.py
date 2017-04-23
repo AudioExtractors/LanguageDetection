@@ -183,8 +183,8 @@ class scoreModel:
         log.write("includeStd             :"+str(AppConfig.includeStd )+ "\n")
         log.write("hiddenLayer            :"+str(AppConfig.hiddenLayer )+ "\n")
         log.write("batch_size             :"+str(AppConfig.batch_size )+ "\n")
-        log.write("nb_epoch               :"+str(AppConfig.batch_size )+ "\n")
-        log.write("selFeatures            :"+str(AppConfig.batch_size )+ "\n")
+        log.write("nb_epoch               :"+str(AppConfig.nb_epoch )+ "\n")
+        log.write("selFeatures            :"+str(AppConfig.selFeatures )+ "\n")
         ##LOGGING END
 
         confusionMatrix = {}
