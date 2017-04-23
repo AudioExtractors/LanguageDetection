@@ -1,16 +1,16 @@
 import AppConfig
 import scoreModel
 import confusion_matrix
-WS=[400,410]#window size
-WH=[100,100]#window hop
-CWS=[1,1]#context WS
-AFPS=[1,1]#Average frames per sample
-ISTD=[True,True]#is std included
+WS=[400,400,400]#window size
+WH=[100,100,100]#window hop
+CWS=[1,2,3]#context WS
+AFPS=[3,1,1]#Average frames per sample
+ISTD=[True,True,False,False]#is std included
 #above four change dump as well so keep equal values consecutive to each other so dumps are not recreated again
-HL=[(11),(12,3)]#hidden layer
-BS=[32,30]#batch size
-NE=[26,30]#epoch
-SF=[39,30]
+HL=[(11),(12),(12)]#hidden layer
+BS=[32,30,30]#batch size
+NE=[26,30,30]#epoch
+SF=[39,50,70]
 sz=len(WS)
 def change(i):
 
@@ -52,8 +52,7 @@ for i in range(sz):
     X = scoreModel.scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
     print "Iteration: ",i
     if change(i):
-        pass
-        #X.dumpFeatureVector()
+        X.dumpFeatureVector()
     confusion_matrix.dumpConfusionMatrix()
     X.normFeature()
     X.selectFeature()
