@@ -53,7 +53,7 @@ class scoreModel:
             ct = 0
             for sample in samples:
                 ct += 1
-                featureVector = sample.getAverageFeatureVector(std=True)
+                featureVector = sample.getAverageFeatureVector(std=AppConfig.includeStd)
                 if len(featureVector) > 0:
                     featuresPerFrame = len(featureVector[0])
                 else:
@@ -152,7 +152,7 @@ class scoreModel:
                 self.bClassifiers[(languages[i], languages[j])].train(X_combined, y_combined)
 
     def predict(self, audio):
-        featureVector = audio.getAverageFeatureVector(std=True)
+        featureVector = audio.getAverageFeatureVector(std=AppConfig.includeStd)
         normFeatureVector = self.norm.transform(featureVector)
         subcandidates = self.classifier.predict(self.sel.transform(normFeatureVector))
         language1 = self.languages[subcandidates[0][1]]
@@ -164,10 +164,10 @@ class scoreModel:
                                                                                                        language2)]])
         label_sum = subcandidates[0][1] + subcandidates[1][1]
         total_label = len(self.languages)
-        for i in xrange(2,total_label):
+        for i in xrange(2, total_label):
             finalcandidates = finalcandidates.append(subcandidates[i])
             label_sum += subcandidates[i][1]
-        if label_sum != ( total_label*(total_label-1) )/2:
+        if label_sum != (total_label*(total_label-1))/2:
             raise ValueError("Unexpected Output Candidates", finalcandidates)
         return finalcandidates
 
@@ -247,8 +247,8 @@ class scoreModel:
 if __name__ == "__main__":
     X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
     # X.createAudioDumps()
-    X.dumpFeatureVector()
-    confusion_matrix.dumpConfusionMatrix()
+    # X.dumpFeatureVector()
+    # confusion_matrix.dumpConfusionMatrix()
     X.normFeature()
     X.selectFeature()
     X.train()
