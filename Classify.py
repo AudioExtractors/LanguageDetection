@@ -2,7 +2,7 @@ import numpy
 numpy.random.seed(1337)
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
-from keras.regularizers import activity_l2
+from keras.regularizers import activity_l2, activity_l1l2
 from keras.models import load_model
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.utils import shuffle
@@ -15,17 +15,17 @@ class Classify:
         hidden_layers = AppConfig.getHiddenLayer()
         self.model = Sequential()
         if isinstance(hidden_layers, (collections.Sequence, numpy.ndarray)):
-            self.model.add(Dense(hidden_layers[0], input_dim=AppConfig.selFeatures, activity_regularizer=activity_l2(),
-                      activation='sigmoid'))
+            self.model.add(Dense(hidden_layers[0], input_dim=AppConfig.selFeatures, activity_regularizer=activity_l1l2(),
+                      activation='relu'))
             # self.model.add(Dropout(0.2))
             for num in range(1, len(hidden_layers)):
-                self.model.add(Dense(hidden_layers[num], activity_regularizer=activity_l2(), activation='sigmoid'))
+                self.model.add(Dense(hidden_layers[num], activity_regularizer=activity_l1l2(), activation='relu'))
                 # self.model.add(Dropout(0.1))
         else:
             self.model.add(
-                Dense(hidden_layers, input_dim=AppConfig.selFeatures, activity_regularizer=activity_l2(),
-                      activation='sigmoid'))
-        self.model.add(Dense(AppConfig.getNumLanguages(), activity_regularizer=activity_l2(), activation='softmax'))
+                Dense(hidden_layers, input_dim=AppConfig.selFeatures, activity_regularizer=activity_l1l2(),
+                      activation='relu'))
+        self.model.add(Dense(AppConfig.getNumLanguages(), activity_regularizer=activity_l1l2(), activation='softmax'))
         self.model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'])
 
     def train(self, X, Y):
@@ -36,8 +36,7 @@ class Classify:
         # shuffle is true by default (shuffle batches)
         output = LabelBinarizer().fit(range(AppConfig.getNumLanguages())).transform(Y)
         X, output = shuffle(X, output, random_state=10)
-        self.model.fit(X, output, batch_size=AppConfig.getBatchSize(),
-                                 nb_epoch=AppConfig.getNumberEpochs())
+        self.model.fit(X, output, batch_size=AppConfig.getBatchSize(), nb_epoch=AppConfig.getNumberEpochs())
 
     def predict(self, feature):
         prediction_vector = self.model.predict_proba(feature, verbose=0)
