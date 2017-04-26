@@ -4,6 +4,15 @@ import wave
 import AppConfig
 import scoreModel
 import Audio
+import subprocess
+
+src = "C:\\Users\\win 8.1\\Desktop\\evaluate.mp3"
+dest = "C:\\Users\\win 8.1\\Desktop\\1.wav"
+
+
+def convert(src, dest):
+    subprocess.call(["C:\\Users\\win 8.1\\Desktop\\Dataset Download\\ffmpeg-20170411-f1d80bc-win64-static\\bin\\ffmpeg",
+                    "-i", src, "-ac", "1", "-ar", "16000", "-y", dest])
 
 path = 'C:\\Users\\win 8.1\\Desktop\\1.wav'
 spf = wave.open(path, 'r')
@@ -11,14 +20,12 @@ fs = spf.getframerate()
 X = scoreModel.scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
 X.normFeature()
 X.selectFeature()
-# X.train()
 X.loadNN("NN")
-# X.binaryTrain()
 X.loadBinaryNN("Binary")
 plt.figure(1)
 plt.title('Signal Wave')
 color = ['r', 'g', 'b']
-numSeconds = 2
+numSeconds = 6
 while spf.tell() != spf.getnframes():
     signal = spf.readframes(fs * numSeconds)
     signal = np.fromstring(signal, 'Int16')
