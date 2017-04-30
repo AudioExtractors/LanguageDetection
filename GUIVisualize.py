@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import subprocess
 import wave
 import scoreModel
@@ -99,6 +100,11 @@ class MainWidget(QWidget):
             results = classifier.predict(Audio.Audio(None, signal=signal))
             lang = results[0][1]
             self.Widget.axis.plot(Time, signal, color[lang])
+        handles = []
+        for i in range(len(AppConfig.getLanguages())):
+            patch = mpatches.Patch(color=color[i], label=AppConfig.languages[i])
+            handles.append(patch)
+        self.Widget.axis.legend(handles=handles)
         self.Widget.canvas.draw()
 
 
