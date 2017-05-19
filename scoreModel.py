@@ -176,15 +176,20 @@ class scoreModel:
         ##LOGGING
         fileName = os.path.join(AppConfig.logs_base_dir, "Log" + str(datetime.datetime.now().strftime("%m%d-%H-%M-%S")))
         log = open(fileName+".txt", 'w')
-        log.write("windowSize             :"+str(AppConfig.windowSize) + "\n")
-        log.write("windowHop              :"+str(AppConfig.windowHop )+ "\n")
-        log.write("contextWindowSize      :"+str(AppConfig.contextWindowSize )+ "\n")
-        log.write("averageFramesPerSample :"+str(AppConfig.averageFramesPerSample )+ "\n")
-        log.write("includeStd             :"+str(AppConfig.includeStd )+ "\n")
-        log.write("hiddenLayer            :"+str(AppConfig.hiddenLayer )+ "\n")
-        log.write("batch_size             :"+str(AppConfig.batch_size )+ "\n")
-        log.write("nb_epoch               :"+str(AppConfig.nb_epoch )+ "\n")
-        log.write("selFeatures            :"+str(AppConfig.selFeatures )+ "\n")
+        log.write("Parameters:\n")
+        log.write("windowSize             :" + str(AppConfig.windowSize) + "\n")
+        log.write("windowHop              :" + str(AppConfig.windowHop) + "\n")
+        log.write("contextWindowSize      :" + str(AppConfig.contextWindowSize) + "\n")
+        log.write("averageFramesPerSample :" + str(AppConfig.averageFramesPerSample) + "\n")
+        log.write("includeStd             :" + str(AppConfig.includeStd) + "\n")
+        log.write("hiddenLayer            :" + str(AppConfig.hiddenLayer) + "\n")
+        log.write("batch_size             :" + str(AppConfig.batch_size) + "\n")
+        log.write("nb_epoch               :" + str(AppConfig.nb_epoch) + "\n")
+        log.write("selFeatures            :" + str(AppConfig.selFeatures) + "\n")
+        log.write("binaryHiddenLayer      :" + str(AppConfig.binaryHiddenLayer) + "\n")
+        log.write("binary_batch_size      :" + str(AppConfig.binary_batch_size) + "\n")
+        log.write("binary_nb_epoch        :" + str(AppConfig.binary_nb_epoch) + "\n")
+        log.write("selBinaryFeatures      :" + str(AppConfig.selBinaryFeatures) + "\n")
         ##LOGGING END
 
         confusionMatrix = {}
@@ -197,7 +202,7 @@ class scoreModel:
 
         analysis = []
         for language in self.languages:
-            log.write("Testing for samples in " + language + "\n")
+            log.write("\nTesting for samples in " + language + "\n")
             Total = AppConfig.getTestEpoch()
             success = 0
             completefailure = 0
@@ -211,36 +216,60 @@ class scoreModel:
                 confusionMatrix[key] += 1
                 if self.languages[subcandidates[0][1]] == language:
                     success += 1
-                    log.write("[Correct]"+sample.getIndex() + " " + str(subcandidates) + "\n")
+                    log.write("[Correct] "+sample.getIndex() + " " + str(subcandidates) + "\n")
                 else:
                     if self.languages[subcandidates[2][1]] == language:
                         completefailure += 1
-                    log.write("[Wrong]"+sample.getIndex() + " " + str(subcandidates) + "\n")
+                    log.write("[Wrong]   "+sample.getIndex() + " " + str(subcandidates) + "\n")
             totalCount[language] = total
             analysis.append((language, float(success*100)/Total))
             analysis.append((language, 100.0 - float(completefailure * 100) / Total))
-        sys.stdout.write("     ")
 
+        confusionMatrixTemp = []
+        print "\nConfusion Matrix:"
+        sys.stdout.write("      ")
         for language in self.languages:
-            print language+"   ",
+            print language + "    ",
         for language in self.languages:
-            sys.stdout.write("\n"+language+"   ")
+            sys.stdout.write("\n" + language + "   ")
+            confusionMatrixTempRow = []
             for language2 in self.languages:
-                print "%d" % confusionMatrix[(language, language2)]+"   ",
+                print "%3d" % confusionMatrix[(language, language2)] + "   ",
+                confusionMatrixTempRow.append(confusionMatrix[(language, language2)])
+            confusionMatrixTemp.append(confusionMatrixTempRow)
         print "\n"
 
+        print "Final Analysis"
+        confusionMatrixTemp = np.array(confusionMatrixTemp)
+        FP = confusionMatrixTemp.sum(axis=0) - np.diag(confusionMatrixTemp)
+        FN = confusionMatrixTemp.sum(axis=1) - np.diag(confusionMatrixTemp)
+        TP = np.diag(confusionMatrixTemp)
+        TN = confusionMatrixTemp.sum() - (FP + FN + TP)
+        FP = FP.astype(float)
+        FN = FN.astype(float)
+        TP = TP.astype(float)
+        TN = TN.astype(float)
+        ACC = (TP+TN)/(TP+FP+FN+TN)
+        PRE = TP / (TP + FP)
+        REC = TP / (TP + FN)
+        print "Accuracy :", np.mean(ACC)
+        print "Precision:", np.mean(PRE)
+        print "Recall   :", np.mean(REC)
+        print ""
+
         ##LOGGING
-        log.write("Confusion Matrix on number of Samples:")
+        log.write("\nConfusion Matrix on number of Samples:\n")
         log.write(str(confusionMatrix) + "\n" + "\n")
         for language in self.languages:
                 for language2 in self.languages:
                     confusionMatrix[(language, language2)] /= float(totalCount[language])
-        log.write("Confusion Matrix on Percentage of Samples:")
+        log.write("Confusion Matrix on Percentage of Samples:\n")
         log.write(str(confusionMatrix) + "\n" + "\n")
-        log.write("Final Analysis"+ "\n" + "\n")
+        log.write("Final Analysis" + "\n")
         log.write(str(analysis))
-
         print "See logs in -", fileName
+        ##LOGGINGEND
+
         return analysis
 
     def saveNN(self, name):
@@ -265,11 +294,13 @@ if __name__ == "__main__":
     X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
     # X.createAudioDumps()
     # X.dumpFeatureVector()
-    # confusion_matrix.dumpConfusionMatrix()
+    confusion_matrix.dumpConfusionMatrix()
     X.normFeature()
     X.selectFeature()
-    X.train()
+    # X.train()
     # X.saveNN("NN")
-    # X.loadNN("NN")
-    X.binaryTrain()
-    print X.analyse()
+    X.loadNN("NN")
+    # X.binaryTrain()
+    # X.saveBinaryNN("Binary")
+    X.loadBinaryNN("Binary")
+    analysis = X.analyse()
