@@ -2,7 +2,7 @@ import numpy
 numpy.random.seed(1337)
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
-# from keras.regularizers import activity_l2, activity_l1l2
+from keras.regularizers import activity_l2, activity_l1l2
 from keras.models import load_model
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.utils import shuffle
@@ -15,15 +15,17 @@ class BinaryClassify:
         hidden_layers = AppConfig.getBinaryHiddenLayer()
         self.model = Sequential()
         if isinstance(hidden_layers, (collections.Sequence, numpy.ndarray)):
-            self.model.add(Dense(hidden_layers[0], input_dim=AppConfig.selBinaryFeatures, activation='relu'))
+            self.model.add(Dense(hidden_layers[0], input_dim=AppConfig.selBinaryFeatures,
+                                 activity_regularizer=activity_l1l2(), activation='relu'))
             # self.model.add(Dropout(0.2))
             for num in range(1, len(hidden_layers)):
-                self.model.add(Dense(hidden_layers[num], activation='relu'))
+                self.model.add(Dense(hidden_layers[num], activity_regularizer=activity_l1l2(), activation='relu'))
                 # self.model.add(Dropout(0.2))
         else:
-            self.model.add(Dense(hidden_layers, input_dim=AppConfig.selBinaryFeatures, activation='relu'))
+            self.model.add(Dense(hidden_layers, input_dim=AppConfig.selBinaryFeatures,
+                                 activity_regularizer=activity_l1l2(), activation='relu'))
             # self.model.add(Dropout(0.2))
-        self.model.add(Dense(2, activation='softmax'))
+        self.model.add(Dense(2, activity_regularizer=activity_l1l2(), activation='softmax'))
         self.model.compile(optimizer='adadelta', loss='binary_crossentropy', metrics=['accuracy'])
         if labels == -1:
             labels = range(2)
