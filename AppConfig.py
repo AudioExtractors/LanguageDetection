@@ -20,8 +20,9 @@ for i in range(26, 39):
 windowSize = 400  # In number of frames
 windowHop = 100  # In number of frames
 contextWindowSize = 5  # -x/2 to +x/2 number of frames
-averageFramesPerSample = 3  # each clip treated as one sample by average out
-includeStd = False
+averageFramesPerSample = 1  # each clip treated as one sample by average out
+includeStd = True
+includeBaseline = True
 if includeStd == True:
     numberOfAverageStats = 2
 else:
@@ -46,16 +47,16 @@ gmmLogs_base_dir = os.path.join(logs_base_dir, "gmm")
 NN_save_dir = "NNFiles"
 
 # Initial NN Characteristics
-hiddenLayer = (18, 9, 5)  # approx (2/3) * len(featureSet) * contextWindow
-batch_size = 38
+hiddenLayer = (12)  # approx (2/3) * len(featureSet) * contextWindow
+batch_size = 1
 nb_epoch = 30
-selFeatures = 39
+selFeatures = 180
 
 # Binary NN Characteristics
-binaryHiddenLayer = (10, 7)
-binary_batch_size = 30
-binary_nb_epoch = 30
-selBinaryFeatures = 36
+binaryHiddenLayer = (10, 4)
+binary_batch_size = 1
+binary_nb_epoch = 40
+selBinaryFeatures = 170
 
 # GMM Features
 gmmWindowSize = 400

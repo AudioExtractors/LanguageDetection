@@ -18,7 +18,8 @@ class scoreModel:
     def __init__(self, languages, epoch):
         self.languages = languages
         self.epoch = epoch
-        self.baselineClassfier = SGDClassifier(warm_start=True)
+        if AppConfig.includeBaseline:
+            self.baselineClassfier = SGDClassifier(warm_start=True)
         self.classifier = Classify.Classify()
         self.bClassifiers = {}
         for i in xrange(len(languages) - 1):
@@ -123,7 +124,8 @@ class scoreModel:
                     combined_feature = np.vstack((combined_feature, X))
                     combined_label = np.concatenate((combined_label, y))
             X = self.sel.transform(combined_feature)
-            self.baselineClassfier.fit(X, combined_label)
+            if AppConfig.includeBaseline:
+                self.baselineClassfier.fit(X, combined_label)
             self.classifier.train(X, combined_label)
 
     def binaryTrain(self):
@@ -158,7 +160,8 @@ class scoreModel:
     def predict(self, audio):
         featureVector = audio.getAverageFeatureVector(std=AppConfig.includeStd)
         normFeatureVector = self.norm.transform(featureVector)
-        subcandidatesbaseline = self.baselineClassfier.predict(self.sel.transform(normFeatureVector))
+        if AppConfig.includeBaseline:
+            subcandidatesbaseline = self.baselineClassfier.predict(self.sel.transform(normFeatureVector))
         subcandidates = self.classifier.predict(self.sel.transform(normFeatureVector))
         language1 = self.languages[subcandidates[0][1]]
         language2 = self.languages[subcandidates[1][1]]
@@ -174,7 +177,10 @@ class scoreModel:
             label_sum += subcandidates[i][1]
         if label_sum != (total_label*(total_label-1))/2:
             raise ValueError("Unexpected Output Candidates", finalcandidates)
-        return (subcandidatesbaseline, finalcandidates)
+        if AppConfig.includeBaseline:
+            return (subcandidatesbaseline, finalcandidates)
+        else:
+            return finalcandidates
 
     def analyse(self):
         ##LOGGING
@@ -200,10 +206,11 @@ class scoreModel:
         for language in self.languages:
             for language2 in self.languages:
                 confusionMatrix[(language, language2)] = 0
-        confusionMatrixBaseline = {}
-        for language in self.languages:
-            for language2 in self.languages:
-                confusionMatrixBaseline[(language, language2)] = 0
+        if AppConfig.includeBaseline:
+            confusionMatrixBaseline = {}
+            for language in self.languages:
+                for language2 in self.languages:
+                    confusionMatrixBaseline[(language, language2)] = 0
         totalCount = {}
         for language in self.languages:
             totalCount[language] = 0
@@ -219,9 +226,13 @@ class scoreModel:
             samples = AudioIO.getDumpTestSample(language)
             for sample in samples:
                 total += 1
-                subcandidatesbaseline, subcandidates = self.predict(sample)
-                key = (language, self.languages[subcandidatesbaseline[0]])
-                confusionMatrixBaseline[key] += 1
+                if AppConfig.includeBaseline:
+                    subcandidatesbaseline, subcandidates = self.predict(sample)
+                else:
+                    subcandidates = self.predict(sample)
+                if AppConfig.includeBaseline:
+                    key = (language, self.languages[subcandidatesbaseline[0]])
+                    confusionMatrixBaseline[key] += 1
                 key = (language, self.languages[subcandidates[0][1]])
                 confusionMatrix[key] += 1
                 if self.languages[subcandidates[0][1]] == language:
@@ -236,20 +247,24 @@ class scoreModel:
             analysis.append((language, 100.0 - float(completefailure * 100) / Total))
 
         confusionMatrixTemp = []
-        confusionMatrixTempBaseline = []
+        if AppConfig.includeBaseline:
+            confusionMatrixTempBaseline = []
         # print "\nConfusion Matrix:"
         # sys.stdout.write("      ")
         # for language in self.languages:
         #     print language + "    ",
         for language in self.languages:
             # sys.stdout.write("\n" + language + "   ")
+            if AppConfig.includeBaseline:
+                confusionMatrixTempRowBaseline = []
             confusionMatrixTempRow = []
-            confusionMatrixTempRowBaseline = []
             for language2 in self.languages:
                 # print "%3d" % confusionMatrix[(language, language2)] + "   ",
-                confusionMatrixTempRowBaseline.append(confusionMatrixBaseline[(language, language2)])
+                if AppConfig.includeBaseline:
+                    confusionMatrixTempRowBaseline.append(confusionMatrixBaseline[(language, language2)])
                 confusionMatrixTempRow.append(confusionMatrix[(language, language2)])
-            confusionMatrixTempBaseline.append(confusionMatrixTempRowBaseline)
+            if AppConfig.includeBaseline:
+                confusionMatrixTempBaseline.append(confusionMatrixTempRowBaseline)
             confusionMatrixTemp.append(confusionMatrixTempRow)
         # print "\n"
 
@@ -266,23 +281,30 @@ class scoreModel:
         ACC = (TP+TN)/(TP+FP+FN+TN)
         PRE = TP / (TP + FP)
         REC = TP / (TP + FN)
-        confusionMatrixTempBaseline = np.array(confusionMatrixTempBaseline)
-        FPBaseline = confusionMatrixTempBaseline.sum(axis=0) - np.diag(confusionMatrixTempBaseline)
-        FNBaseline = confusionMatrixTempBaseline.sum(axis=1) - np.diag(confusionMatrixTempBaseline)
-        TPBaseline = np.diag(confusionMatrixTempBaseline)
-        TNBaseline = confusionMatrixTempBaseline.sum() - (FPBaseline + FNBaseline + TPBaseline)
-        FPBaseline = FPBaseline.astype(float)
-        FNBaseline = FNBaseline.astype(float)
-        TPBaseline = TPBaseline.astype(float)
-        TNBaseline = TNBaseline.astype(float)
-        ACCBaseline = (TPBaseline + TNBaseline) / (TPBaseline + FPBaseline + FNBaseline + TNBaseline)
-        PREBaseline = TPBaseline / (TPBaseline + FPBaseline)
-        RECBaseline = TPBaseline / (TPBaseline + FNBaseline)
-        print "           Baseline SGD Classifier Model    Neural Network Hybrid Model"
-        print "Accuracy : %.2f" % (np.mean(ACCBaseline) * 100) + "%" + "                           %.2f" % (np.mean(ACC) * 100) + "%"
-        print "Precision: %.2f" % (np.mean(PREBaseline) * 100) + "%" + "                           %.2f" % (np.mean(PRE) * 100) + "%"
-        print "Recall   : %.2f" % (np.mean(RECBaseline) * 100) + "%" + "                           %.2f" % (np.mean(REC) * 100) + "%"
-        print ""
+        if AppConfig.includeBaseline:
+            confusionMatrixTempBaseline = np.array(confusionMatrixTempBaseline)
+            FPBaseline = confusionMatrixTempBaseline.sum(axis=0) - np.diag(confusionMatrixTempBaseline)
+            FNBaseline = confusionMatrixTempBaseline.sum(axis=1) - np.diag(confusionMatrixTempBaseline)
+            TPBaseline = np.diag(confusionMatrixTempBaseline)
+            TNBaseline = confusionMatrixTempBaseline.sum() - (FPBaseline + FNBaseline + TPBaseline)
+            FPBaseline = FPBaseline.astype(float)
+            FNBaseline = FNBaseline.astype(float)
+            TPBaseline = TPBaseline.astype(float)
+            TNBaseline = TNBaseline.astype(float)
+            ACCBaseline = (TPBaseline + TNBaseline) / (TPBaseline + FPBaseline + FNBaseline + TNBaseline)
+            PREBaseline = TPBaseline / (TPBaseline + FPBaseline)
+            RECBaseline = TPBaseline / (TPBaseline + FNBaseline)
+            print "           Baseline SGD Classifier Model    Neural Network Hybrid Model"
+            print "Accuracy : %.2f" % (np.mean(ACCBaseline) * 100) + "%" + "                           %.2f" % (np.mean(ACC) * 100) + "%"
+            print "Precision: %.2f" % (np.mean(PREBaseline) * 100) + "%" + "                           %.2f" % (np.mean(PRE) * 100) + "%"
+            print "Recall   : %.2f" % (np.mean(RECBaseline) * 100) + "%" + "                           %.2f" % (np.mean(REC) * 100) + "%"
+            print ""
+        else:
+            print "Neural Network Hybrid Model"
+            print "Accuracy : %.2f" % (np.mean(ACC) * 100) + "%"
+            print "Precision: %.2f" % (np.mean(PRE) * 100) + "%"
+            print "Recall   : %.2f" % (np.mean(REC) * 100) + "%"
+            print ""
 
         ##LOGGING
         log.write("\nConfusion Matrix on number of Samples:\n")

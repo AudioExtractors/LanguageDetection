@@ -37,6 +37,12 @@ class MainWidget(QWidget):
         self.text = QLabel('Select file to Analyse', self)
         self.text.setFont(self.font)
         self.text.setGeometry(312, 0, 140, 20)
+        self.finalpredict = QLabel("", self)
+        self.finalpredictfont = QFont()
+        self.finalpredictfont.setBold(True)
+        self.finalpredictfont.setUnderline(True)
+        self.finalpredict.setFont(self.finalpredictfont)
+        self.finalpredict.setGeometry(304, 80, 150, 20)
         self.fileName = QLineEdit(self)
         self.fileName.setReadOnly(True)
         self.fileName.setGeometry(10, 30, 660, 40)
@@ -47,11 +53,12 @@ class MainWidget(QWidget):
         self.hbox = QHBoxLayout()
         self.hbox.addWidget(self.Widget)
         self.vbox = QVBoxLayout()
-        self.vbox.addStretch(2)
+        self.vbox.addStretch(3)
         self.vbox.addLayout(self.hbox)
         self.setLayout(self.vbox)
         self.resize(750, 630)
         self.show()
+        AppConfig.includeBaseline = False
 
     def updateText(self, file):
         self.fileName.setText(file)
@@ -71,6 +78,9 @@ class MainWidget(QWidget):
         spf = wave.open(file, 'r')
         classifier = self.loadNN()
         self.plotFigure(spf, classifier)
+        spf.close()
+        spf = wave.open(file, 'r')
+        self.finalPredict(spf, classifier)
         spf.close()
         self.clearFile(file)
 
@@ -106,6 +116,12 @@ class MainWidget(QWidget):
             handles.append(patch)
         self.Widget.axis.legend(handles=handles)
         self.Widget.canvas.draw()
+
+    def finalPredict(self, spf, classifier):
+        signal = spf.readframes(-1)
+        signal = np.fromstring(signal, 'Int16')
+        finalprediction = classifier.predict(Audio.Audio(None, signal=signal))
+        self.finalpredict.setText("Predicted language: " + AppConfig.languages[finalprediction[0][1]])
 
 
 def main():
