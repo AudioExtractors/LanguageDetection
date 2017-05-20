@@ -1,6 +1,6 @@
 import os
 
-languages = ["ch", "ru", "ge"]
+languages = ["ch", "fr", "ge"]
 
 # Feature Extraction
 featureNames = ["MFCC 1", "MFCC 2", "MFCC 3", "MFCC 4", "MFCC 5", "MFCC 6", "MFCC 7", "MFCC 8", "MFCC 9", "MFCC 10",
@@ -30,8 +30,8 @@ else:
 fixedAudioLength = 0.0  # In seconds
 
 # Data Size
-trainingDataSize = 1183
-test_epoch = 253
+trainingDataSize = 1105
+test_epoch = 236
 trainingBatchSize = 1000000000000
 maxTrainingSamples = 1183
 maxTestSamples = 253
@@ -53,10 +53,10 @@ nb_epoch = 30
 selFeatures = 180
 
 # Binary NN Characteristics
-binaryHiddenLayer = (10, 4)
-binary_batch_size = 1
-binary_nb_epoch = 40
-selBinaryFeatures = 170
+binaryHiddenLayer = (20)
+binary_batch_size = 10
+binary_nb_epoch = 30
+selBinaryFeatures = 180
 
 # GMM Features
 gmmWindowSize = 400
