@@ -22,7 +22,7 @@ windowHop = 100  # In number of frames
 contextWindowSize = 5  # -x/2 to +x/2 number of frames
 averageFramesPerSample = 1  # each clip treated as one sample by average out
 includeStd = True
-includeBaseline = True
+includeBaseline = False
 if includeStd == True:
     numberOfAverageStats = 2
 else:
