@@ -6,7 +6,7 @@ import AppConfig
 import Audio
 
 def data_to_array(data):
-    return (np.frombuffer(data, dtype=np.int16).reshape((-1, 1)))
+    return (np.frombuffer(data, dtype=np.int16).reshape((-1, )))
 
 class RealTime:
     def __init__(self, languages):
@@ -26,8 +26,7 @@ class RealTime:
         # define callback (2)
         def callback(in_data, frame_count, time_info, status):
             samples = data_to_array(in_data)
-            print samples.shape
-            a, result = self.classifier.predict(Audio.Audio(None, signal=samples))
+            result = self.classifier.predict(Audio.Audio(None, signal=samples))
             print self.languages[result[0][1]]
             return (None, pyaudio.paContinue)
 
