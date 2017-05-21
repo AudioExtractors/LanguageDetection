@@ -50,9 +50,10 @@ class RealTime:
             plt.ylabel('Amplitude')
             fig = plt.figure(plt.gcf().number)
             fig.canvas.set_window_title("Audio Detection")
+            plt.ylim((-20000, 20000))
             plt.pause(0.001)
-            if self.time % 5 == 0:
-                plt.clf()
+            # if self.time % 5 == 0:
+            #     plt.clf()
             return None, pyaudio.paContinue
 
         # open stream (3)
