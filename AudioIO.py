@@ -85,8 +85,8 @@ def getDumpTestSample(language):
             sig = np.load(path)
             audio = Audio.Audio(path, sig)
             samples.append(audio)
-            ct+=1
-            if ct==AppConfig.getTestEpoch():
+            ct += 1
+            if ct == AppConfig.getTestEpoch():
                 break
     return samples
 
