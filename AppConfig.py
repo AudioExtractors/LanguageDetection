@@ -1,6 +1,6 @@
 import os
 
-languages = ["ch", "fr", "ge"]
+languages = ["ch", "fr"]
 
 # Feature Extraction
 featureNames = ["MFCC 1", "MFCC 2", "MFCC 3", "MFCC 4", "MFCC 5", "MFCC 6", "MFCC 7", "MFCC 8", "MFCC 9", "MFCC 10",
@@ -53,10 +53,10 @@ nb_epoch = 30
 selFeatures = 180
 
 # Binary NN Characteristics
-binaryHiddenLayer = (20)
+binaryHiddenLayer = (22)
 binary_batch_size = 10
 binary_nb_epoch = 30
-selBinaryFeatures = 180
+selBinaryFeatures = 380
 
 # GMM Features
 gmmWindowSize = 400
