@@ -239,7 +239,7 @@ class scoreModel:
                     success += 1
                     log.write("[Correct] "+sample.getIndex() + " " + str(subcandidates) + "\n")
                 else:
-                    if self.languages[subcandidates[2][1]] == language:
+                    if self.languages[subcandidates[0][1]] != language and self.languages[subcandidates[1][1]] != language:
                         completefailure += 1
                     log.write("[Wrong]   "+sample.getIndex() + " " + str(subcandidates) + "\n")
             totalCount[language] = total
@@ -249,24 +249,24 @@ class scoreModel:
         confusionMatrixTemp = []
         if AppConfig.includeBaseline:
             confusionMatrixTempBaseline = []
-        # print "\nConfusion Matrix:"
-        # sys.stdout.write("      ")
-        # for language in self.languages:
-        #     print language + "    ",
+        print "\nConfusion Matrix:"
+        sys.stdout.write("      ")
         for language in self.languages:
-            # sys.stdout.write("\n" + language + "   ")
+            print language + "    ",
+        for language in self.languages:
+            sys.stdout.write("\n" + language + "   ")
             if AppConfig.includeBaseline:
                 confusionMatrixTempRowBaseline = []
             confusionMatrixTempRow = []
             for language2 in self.languages:
-                # print "%3d" % confusionMatrix[(language, language2)] + "   ",
+                print "%3d" % confusionMatrix[(language, language2)] + "   ",
                 if AppConfig.includeBaseline:
                     confusionMatrixTempRowBaseline.append(confusionMatrixBaseline[(language, language2)])
                 confusionMatrixTempRow.append(confusionMatrix[(language, language2)])
             if AppConfig.includeBaseline:
                 confusionMatrixTempBaseline.append(confusionMatrixTempRowBaseline)
             confusionMatrixTemp.append(confusionMatrixTempRow)
-        # print "\n"
+        print "\n"
 
         print "Analysis:"
         confusionMatrixTemp = np.array(confusionMatrixTemp)
@@ -343,13 +343,13 @@ if __name__ == "__main__":
     X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
     # X.createAudioDumps()
     # X.dumpFeatureVector()
-    #onfusion_matrix.dumpConfusionMatrix()
+    confusion_matrix.dumpConfusionMatrix()
     X.normFeature()
     X.selectFeature()
     X.train()
-    X.saveNN("NN")
-    # X.loadNN("NN")
+    #X.saveNN("NN")
+    #X.loadNN("NN")
     X.binaryTrain()
-    X.saveBinaryNN("Binary")
-    # X.loadBinaryNN("Binary")
+    #X.saveBinaryNN("Binary")
+    #X.loadBinaryNN("Binary")
     analysis = X.analyse()
