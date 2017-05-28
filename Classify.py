@@ -35,6 +35,8 @@ class Classify:
         # batch_size for batch size
         # shuffle is true by default (shuffle batches)
         output = LabelBinarizer().fit(range(AppConfig.getNumLanguages())).transform(Y)
+        if output.shape[1] == 1:
+            output = numpy.append(1 - output, output, axis=1)
         X, output = shuffle(X, output, random_state=10)
         self.model.fit(X, output, batch_size=AppConfig.getBatchSize(), nb_epoch=AppConfig.getNumberEpochs())
 
