@@ -1,6 +1,6 @@
 import os
 
-languages = ["ch", "fr"]
+languages = ["ch", "fr", "ge"]
 
 # Feature Extraction
 featureNames = ["MFCC 1", "MFCC 2", "MFCC 3", "MFCC 4", "MFCC 5", "MFCC 6", "MFCC 7", "MFCC 8", "MFCC 9", "MFCC 10",
