@@ -278,7 +278,7 @@ class scoreModel:
         FN = FN.astype(float)
         TP = TP.astype(float)
         TN = TN.astype(float)
-        ACC = (TP+TN)/(TP+FP+FN+TN)
+        self.ACC = (TP+TN)/(TP+FP+FN+TN)
         PRE = TP / (TP + FP)
         REC = TP / (TP + FN)
         if AppConfig.includeBaseline:
@@ -295,13 +295,13 @@ class scoreModel:
             PREBaseline = TPBaseline / (TPBaseline + FPBaseline)
             RECBaseline = TPBaseline / (TPBaseline + FNBaseline)
             print "           Baseline SGD Classifier Model    Neural Network Hybrid Model"
-            print "Accuracy : %.2f" % (np.mean(ACCBaseline) * 100) + "%" + "                           %.2f" % (np.mean(ACC) * 100) + "%"
+            print "Accuracy : %.2f" % (np.mean(ACCBaseline) * 100) + "%" + "                           %.2f" % (np.mean(self.ACC) * 100) + "%"
             print "Precision: %.2f" % (np.mean(PREBaseline) * 100) + "%" + "                           %.2f" % (np.mean(PRE) * 100) + "%"
             print "Recall   : %.2f" % (np.mean(RECBaseline) * 100) + "%" + "                           %.2f" % (np.mean(REC) * 100) + "%"
             print ""
         else:
             print "Neural Network Hybrid Model"
-            print "Accuracy : %.2f" % (np.mean(ACC) * 100) + "%"
+            print "Accuracy : %.2f" % (np.mean(self.ACC) * 100) + "%"
             print "Precision: %.2f" % (np.mean(PRE) * 100) + "%"
             print "Recall   : %.2f" % (np.mean(REC) * 100) + "%"
             print ""
@@ -339,17 +339,20 @@ class scoreModel:
                 self.bClassifiers[(self.languages[i], self.languages[j])].load(os.path.join(AppConfig.NN_save_dir, name
                                                                                             + str(i) + str(j)))
 
+    def returnACC(self):
+        return self.ACC
+
 if __name__ == "__main__":
     X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
     # X.createAudioDumps()
-    X.dumpFeatureVector()
-    confusion_matrix.dumpConfusionMatrix()
+    # X.dumpFeatureVector()
+    # confusion_matrix.dumpConfusionMatrix()
     X.normFeature()
     X.selectFeature()
     X.train()
     # X.saveNN("NN")
-    # X.loadNN("NN")
-    X.binaryTrain()
+    X.loadNN("NN")
+    # X.binaryTrain()
     # X.saveBinaryNN("Binary")
-    # X.loadBinaryNN("Binary")
+    X.loadBinaryNN("Binary")
     analysis = X.analyse()
