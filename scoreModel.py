@@ -342,8 +342,8 @@ class scoreModel:
 if __name__ == "__main__":
     X = scoreModel(AppConfig.languages, AppConfig.getTrainingDataSize())
     # X.createAudioDumps()
-    X.dumpFeatureVector()
-    confusion_matrix.dumpConfusionMatrix()
+    # X.dumpFeatureVector()
+    # confusion_matrix.dumpConfusionMatrix()
     X.normFeature()
     X.selectFeature()
     X.train()
