@@ -1,0 +1,11 @@
+import matplotlib.pyplot as plt
+
+x = range(20,381,40)
+y = [80.225988700564969, 87.947269303201509, 89.642184557438796, 91.713747645951031, 93.502824858757066, 93.220338983050837, 91.807909604519779, 89.642184557438796, 90.207156308851225, 89.92467043314501]
+plt.plot(x,y)
+
+plt.xlabel('Number of Features')
+plt.ylabel('Accuracy')
+plt.grid(True)
+plt.savefig("test.png")
+plt.show()
