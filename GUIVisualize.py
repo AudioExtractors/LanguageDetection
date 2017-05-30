@@ -60,6 +60,7 @@ class MainWidget(QWidget):
         self.resize(750, 630)
         self.show()
         AppConfig.includeBaseline = False
+        self.classifier = self.loadNN()
 
     def updateText(self, file):
         self.fileName.setText(file)
@@ -77,11 +78,10 @@ class MainWidget(QWidget):
 
     def processFile(self, file):
         spf = wave.open(file, 'r')
-        classifier = self.loadNN()
-        self.plotFigure(spf, classifier)
+        self.plotFigure(spf, self.classifier)
         spf.close()
         spf = wave.open(file, 'r')
-        self.finalPredict(spf, classifier)
+        self.finalPredict(spf, self.classifier)
         spf.close()
         self.clearFile(file)
 
