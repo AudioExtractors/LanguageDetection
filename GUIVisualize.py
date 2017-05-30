@@ -11,6 +11,7 @@ import scoreModel
 import AppConfig
 import numpy as np
 import Audio
+import math
 
 
 class FileWidget(QWidget):
@@ -103,10 +104,12 @@ class MainWidget(QWidget):
         fs = spf.getframerate()
         color = ['r', 'g', 'b']
         numSeconds = 6
+        spfTellPrev = 0
         while spf.tell() != spf.getnframes():
+            spfTellPrev = spf.tell()
             signal = spf.readframes(fs * numSeconds)
             signal = np.fromstring(signal, 'Int16')
-            Time = np.linspace(float(spf.tell() - numSeconds * fs) / fs, float(spf.tell()) / fs, num=len(signal))
+            Time = np.linspace(float(float(spfTellPrev) / float(fs)), float(float(spf.tell()) / float(fs)), num=len(signal))
             results = classifier.predict(Audio.Audio(None, signal=signal))
             lang = results[0][1]
             self.Widget.axis.plot(Time, signal, color[lang])
@@ -115,6 +118,8 @@ class MainWidget(QWidget):
             patch = mpatches.Patch(color=color[i], label=AppConfig.languages[i])
             handles.append(patch)
         self.Widget.axis.legend(handles=handles)
+        self.Widget.axis.set_xlabel('Time')
+        self.Widget.axis.set_ylabel('Amplitude')
         self.Widget.canvas.draw()
 
     def finalPredict(self, spf, classifier):
